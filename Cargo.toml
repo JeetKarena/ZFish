@@ -2,5 +2,42 @@
 name = "kite"
 version = "0.1.0"
 edition = "2024"
+authors = ["Jeet Karena <you@example.com>"]
+description = "A secure, dependency-free Rust library for building CLI tools"
+repository = "https://github.com/example/kite"
+license = "MIT"
+readme = ".github/instructions/README.md"
 
 [dependencies]
+# Intentionally empty — no third-party crates
+
+[dev-dependencies]
+# Even in tests, we maintain zero dependencies
+
+[[test]]
+name = "args_test"
+path = "tests/test_args.rs"
+
+[[test]]
+name = "style_test"
+path = "tests/test_style.rs"
+
+[[test]]
+name = "progress_test"
+path = "tests/test_progress.rs"
+
+[[test]]
+name = "prompt_test"
+path = "tests/test_prompt.rs"
+
+[[test]]
+name = "logger_test"
+path = "tests/test_logger.rs"
+
+[[test]]
+name = "term_test"
+path = "tests/test_term.rs"
+
+[[test]]
+name = "integration_test"
+path = "tests/integration_test.rs"
