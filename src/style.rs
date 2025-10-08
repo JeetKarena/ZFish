@@ -21,6 +21,8 @@ pub enum Color {
     BrightMagenta,
     BrightCyan,
     BrightWhite,
+    /// Custom 256-color (0-255)
+    Custom(u8),
 }
 
 /// Text styling options
@@ -43,25 +45,28 @@ pub struct StyledString {
 }
 
 impl Color {
-    /// Convert color to its ANSI color code
-    fn to_fg_code(&self) -> u8 {
+    /// Convert color to its ANSI foreground code string
+    /// For standard colors: returns the code (e.g., "31")
+    /// For custom 256 colors: returns "38;5;n"
+    fn to_fg_code_string(&self) -> String {
         match self {
-            Color::Black => 30,
-            Color::Red => 31,
-            Color::Green => 32,
-            Color::Yellow => 33,
-            Color::Blue => 34,
-            Color::Magenta => 35,
-            Color::Cyan => 36,
-            Color::White => 37,
-            Color::BrightBlack => 90,
-            Color::BrightRed => 91,
-            Color::BrightGreen => 92,
-            Color::BrightYellow => 93,
-            Color::BrightBlue => 94,
-            Color::BrightMagenta => 95,
-            Color::BrightCyan => 96,
-            Color::BrightWhite => 97,
+            Color::Black => "30".to_string(),
+            Color::Red => "31".to_string(),
+            Color::Green => "32".to_string(),
+            Color::Yellow => "33".to_string(),
+            Color::Blue => "34".to_string(),
+            Color::Magenta => "35".to_string(),
+            Color::Cyan => "36".to_string(),
+            Color::White => "37".to_string(),
+            Color::BrightBlack => "90".to_string(),
+            Color::BrightRed => "91".to_string(),
+            Color::BrightGreen => "92".to_string(),
+            Color::BrightYellow => "93".to_string(),
+            Color::BrightBlue => "94".to_string(),
+            Color::BrightMagenta => "95".to_string(),
+            Color::BrightCyan => "96".to_string(),
+            Color::BrightWhite => "97".to_string(),
+            Color::Custom(n) => format!("38;5;{}", n),
         }
     }
     
@@ -108,15 +113,20 @@ impl StyledString {
     
     /// Detect if terminal supports colors
     fn supports_colors() -> bool {
-        // Force colors in test environment
-        if cfg!(test) {
-            return true;
+        // `NO_COLOR` environment variable should always disable colors.
+        if std::env::var("NO_COLOR").is_ok() {
+            return false;
         }
-        
-        // Simple detection based on environment variables
-        std::env::var("NO_COLOR").is_err() && 
-        (std::env::var("TERM").map(|term| term != "dumb").unwrap_or(false) ||
-         std::env::var("COLORTERM").is_ok())
+
+        // In a test environment, enable colors if `COLORTERM` is set,
+        // which indicates explicit support.
+        if cfg!(test) {
+            return std::env::var("COLORTERM").is_ok();
+        }
+
+        // Standard detection for non-test environments.
+        std::env::var("TERM").map_or(false, |term| term != "dumb") ||
+        std::env::var("COLORTERM").is_ok()
     }
 }
 
@@ -131,10 +141,10 @@ impl fmt::Display for StyledString {
         
         // Add color code if present
         if let Some(color) = self.color {
-            codes.push(color.to_fg_code().to_string());
+            codes.push(color.to_fg_code_string());
         }
         
-        // Add style codes
+        // Add style codes (convert to string)
         for style in &self.styles {
             codes.push(style.to_code().to_string());
         }

@@ -2,26 +2,23 @@ use kite::style::{Color, Style};
 
 // Helper functions for testing the Kite library
 
-use std::env;
-
 /// Temporarily set an environment variable for the duration of a function
 pub fn with_env_var<F, T>(name: &str, value: Option<&str>, f: F) -> T
 where
     F: FnOnce() -> T,
 {
-    let original = env::var(name).ok();
+    let original = std::env::var(name).ok();
     if let Some(v) = value {
-        // environment API in this workspace requires explicit call context
-        unsafe { env::set_var(name, v); }
+        unsafe { std::env::set_var(name, v) };
     } else {
-        unsafe { env::remove_var(name); }
+        unsafe { std::env::remove_var(name) };
     }
 
     let result = f();
 
     match original {
-        Some(val) => unsafe { env::set_var(name, &val) },
-        None => unsafe { env::remove_var(name) },
+        Some(val) => unsafe { std::env::set_var(name, val) },
+        None => unsafe { std::env::remove_var(name) },
     }
 
     result
@@ -38,42 +35,133 @@ where
 
 #[test]
 fn test_basic_coloring() {
-    // Test that coloring produces expected ANSI sequences
-    let green_text = Color::Green.paint("Success");
     let expected_with_color = "\x1b[32mSuccess\x1b[0m";
     let expected_without_color = "Success";
-    
-    // The display output depends on whether colors are supported
-    // For testing, we'll ensure this works both ways
-    
+
     // Force color support off
-    unsafe { env::set_var("NO_COLOR", "1") };
-    assert_eq!(format!("{}", green_text), expected_without_color);
-    
-    // Force color support on
-    unsafe { env::remove_var("NO_COLOR") };
-    unsafe { env::set_var("COLORTERM", "1") };
-    
-    // Now we need to create a new styled string since the previous one 
-    // cached the color support detection result
-    let green_text = Color::Green.paint("Success");
-    assert_eq!(format!("{}", green_text), expected_with_color);
-    
-    // Clean up environment
-    unsafe { env::remove_var("COLORTERM") };
+    with_env_var("NO_COLOR", Some("1"), || {
+        with_env_var("COLORTERM", None, || {
+            let green_text = Color::Green.paint("Success");
+            assert_eq!(format!("{}", green_text), expected_without_color);
+        });
+    });
+
+    // Force color support on (remove NO_COLOR, set COLORTERM)
+    with_env_var("NO_COLOR", None, || {
+        with_env_var("COLORTERM", Some("1"), || {
+            let green_text = Color::Green.paint("Success");
+            assert_eq!(format!("{}", green_text), expected_with_color);
+        });
+    });
 }
 
 #[test]
 fn test_styling_combinations() {
     // Test combining colors and styles
-    unsafe { env::set_var("COLORTERM", "1") };
-    unsafe { env::remove_var("NO_COLOR") };
-    
-    let styled_text = Color::Red.paint("Error").style(Style::Bold);
-    let expected = "\x1b[31;1mError\x1b[0m";
-    
-    assert_eq!(format!("{}", styled_text), expected);
-    
-    // Clean up environment
-    unsafe { env::remove_var("COLORTERM") };
+    with_env_var("NO_COLOR", None, || {
+        with_env_var("COLORTERM", Some("1"), || {
+            let styled_text = Color::Red.paint("Error").style(Style::Bold);
+            let expected = "\x1b[31;1mError\x1b[0m";
+
+            assert_eq!(format!("{}", styled_text), expected);
+        });
+    });
+}
+
+#[test]
+#[ignore]
+fn test_all_colors_display() {
+    // This is an interactive test to visually verify color display on the terminal.
+    // Run with: cargo test -- --ignored --test style_test
+    // Ensure your terminal (e.g., Windows PowerShell) supports ANSI colors.
+
+    with_env_var("COLORTERM", Some("1"), || {
+        with_env_var("NO_COLOR", None, || {
+            println!("Testing all colors on the terminal:");
+            println!("If colors are not displayed correctly, check your terminal settings.");
+            println!();
+
+            let colors = [
+                Color::Black,
+                Color::Red,
+                Color::Green,
+                Color::Yellow,
+                Color::Blue,
+                Color::Magenta,
+                Color::Cyan,
+                Color::White,
+                Color::BrightBlack,
+                Color::BrightRed,
+                Color::BrightGreen,
+                Color::BrightYellow,
+                Color::BrightBlue,
+                Color::BrightMagenta,
+                Color::BrightCyan,
+                Color::BrightWhite,
+            ];
+
+            for color in &colors {
+                println!("{}", color.paint(format!("This is {:?} color", color)));
+            }
+
+            println!();
+            println!(
+                "Colors should appear as expected. If not, your terminal may not support ANSI colors."
+            );
+
+            // Basic assertion to ensure the test runs without panicking
+            assert!(true);
+           
+        });
+    });
+}
+
+#[test]
+fn test_custom_256_coloring() {
+    // Test custom 256 colors
+    with_env_var("NO_COLOR", None, || {
+        with_env_var("COLORTERM", Some("1"), || {
+            // Test a custom color (e.g., color 196 is a bright red)
+            let custom_text = Color::Custom(196).paint("Custom Red");
+            let expected = "\x1b[38;5;196mCustom Red\x1b[0m";
+            assert_eq!(format!("{}", custom_text), expected);
+
+            // Test combining custom color with style
+            let styled_custom = Color::Custom(46).paint("Custom Green").style(Style::Bold);
+            let expected_styled = "\x1b[38;5;46;1mCustom Green\x1b[0m";
+            assert_eq!(format!("{}", styled_custom), expected_styled);
+        });
+    });
+
+    // Test that custom colors are disabled with NO_COLOR
+    with_env_var("NO_COLOR", Some("1"), || {
+        let custom_text = Color::Custom(100).paint("No Color");
+        assert_eq!(format!("{}", custom_text), "No Color");
+    });
+}
+
+#[test]
+#[ignore]
+fn test_256_colors_display() {
+    // Interactive test to visually verify all 256 colors on the terminal.
+    // Run with: cargo test -- --ignored --test style_test
+    // Ensure your terminal supports ANSI 256 colors.
+
+    with_env_var("COLORTERM", Some("1"), || {
+        with_env_var("NO_COLOR", None, || {
+            println!("Testing all 256 colors on the terminal:");
+            println!("If colors are not displayed correctly, check your terminal settings.");
+            println!();
+
+            for i in 0..=255 {
+                println!("{}", Color::Custom(i).paint(format!("Color {}", i)));
+            }
+
+            println!();
+            println!("All 256 colors should appear. If not, your terminal may not support ANSI 256 colors.");
+
+            // Basic assertion to ensure the test runs without panicking
+            assert!(true);
+        });
+    });
 }
