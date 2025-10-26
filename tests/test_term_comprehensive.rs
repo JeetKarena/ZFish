@@ -18,14 +18,8 @@ fn test_terminal_move_cursor_origin() {
 
 #[test]
 fn test_terminal_move_cursor_various_positions() {
-    let positions = vec![
-        (0, 0),
-        (1, 1),
-        (10, 10),
-        (100, 100),
-        (u16::MAX, u16::MAX),
-    ];
-    
+    let positions = vec![(0, 0), (1, 1), (10, 10), (100, 100), (u16::MAX, u16::MAX)];
+
     for (row, col) in positions {
         let result = Terminal::move_cursor(row, col);
         assert!(result.is_ok() || result.is_err());
@@ -61,7 +55,7 @@ fn test_terminal_print_at_various_positions() {
         (10, 20, "Ten Twenty"),
         (50, 50, "Fifty"),
     ];
-    
+
     for (row, col, text) in tests {
         let result = Terminal::print_at(row, col, text);
         assert!(result.is_ok() || result.is_err());
@@ -83,13 +77,8 @@ fn test_terminal_print_long_string() {
 
 #[test]
 fn test_terminal_print_unicode() {
-    let unicode_texts = vec![
-        "Hello 世界",
-        "Привет мир",
-        "🎉🚀💯",
-        "Ñoño",
-    ];
-    
+    let unicode_texts = vec!["Hello 世界", "Привет мир", "🎉🚀💯", "Ñoño"];
+
     for text in unicode_texts {
         let result = Terminal::print_at(0, 0, text);
         assert!(result.is_ok() || result.is_err());

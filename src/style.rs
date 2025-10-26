@@ -164,7 +164,7 @@ impl Color {
             Color::Custom(n) => format!("38;5;{}", n),
         }
     }
-    
+
     /// Apply color to a string
     pub fn paint<T: Into<String>>(self, text: T) -> StyledString {
         StyledString {
@@ -188,7 +188,7 @@ impl Style {
             Style::Hidden => 8,
         }
     }
-    
+
     /// Apply style to a string
     pub fn apply<T: Into<String>>(&self, text: T) -> StyledString {
         StyledString {
@@ -205,7 +205,7 @@ impl StyledString {
         self.styles.push(style);
         self
     }
-    
+
     /// Detect if terminal supports colors
     fn supports_colors() -> bool {
         // `NO_COLOR` environment variable should always disable colors.
@@ -220,8 +220,8 @@ impl StyledString {
         }
 
         // Standard detection for non-test environments.
-        std::env::var("COLORTERM").is_ok_and(|_| true) ||
-        std::env::var("TERM").is_ok_and(|term| term != "dumb")
+        std::env::var("COLORTERM").is_ok_and(|_| true)
+            || std::env::var("TERM").is_ok_and(|term| term != "dumb")
     }
 }
 
@@ -230,31 +230,26 @@ impl fmt::Display for StyledString {
         if !StyledString::supports_colors() {
             return write!(f, "{}", self.text);
         }
-        
+
         // Start building the ANSI escape sequence
         let mut codes = Vec::new();
-        
+
         // Add color code if present
         if let Some(color) = self.color {
             codes.push(color.to_fg_code_string());
         }
-        
+
         // Add style codes (convert to string)
         for style in &self.styles {
             codes.push(style.code().to_string());
         }
-        
+
         if codes.is_empty() {
             // No styling to apply
             write!(f, "{}", self.text)
         } else {
             // Write the styled text with ANSI escape codes
-            write!(
-                f, 
-                "\x1b[{}m{}\x1b[0m", 
-                codes.join(";"), 
-                self.text
-            )
+            write!(f, "\x1b[{}m{}\x1b[0m", codes.join(";"), self.text)
         }
     }
 }

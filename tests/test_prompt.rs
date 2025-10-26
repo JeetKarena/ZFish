@@ -10,15 +10,19 @@ fn test_confirm_prompt() {
     println!("Please type 'y' when prompted:");
     let result = Prompt::confirm("Are you sure?", false).unwrap();
     println!("You entered: {}", if result { "yes" } else { "no" });
-    
+
     println!("Please type 'n' when prompted:");
     let result = Prompt::confirm("Continue?", true).unwrap();
     println!("You entered: {}", if result { "yes" } else { "no" });
-    
+
     println!("Please press enter when prompted:");
     let result = Prompt::confirm("Accept default (yes)?", true).unwrap();
-    println!("You entered: default ({}) -> {}", if result { "yes" } else { "no" }, result);
-    
+    println!(
+        "You entered: default ({}) -> {}",
+        if result { "yes" } else { "no" },
+        result
+    );
+
     // Interactive test - success is reaching this point
 }
 
@@ -28,7 +32,7 @@ fn test_text_input() {
     println!("Please type any text when prompted:");
     let result = Prompt::input("Enter text:").unwrap();
     println!("You entered: {}", result);
-    
+
     // Don't assert specific values since this is an interactive test
     assert!(!result.is_empty());
 }
@@ -38,10 +42,12 @@ fn test_text_input() {
 fn test_password_input() {
     println!("Please type any password when prompted (input will be hidden):");
     let result = Prompt::password("Enter password:").unwrap();
-    println!("You entered a password with {} characters: {}", 
-             result.len(), 
-             "*".repeat(result.len())); // Don't display the actual password
-    
+    println!(
+        "You entered a password with {} characters: {}",
+        result.len(),
+        "*".repeat(result.len())
+    ); // Don't display the actual password
+
     // Don't assert specific values since this is an interactive test
     assert!(!result.is_empty());
 }

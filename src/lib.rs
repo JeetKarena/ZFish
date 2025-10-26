@@ -66,17 +66,17 @@
 //! ╚═══════════════════════════════════════════════════════════════╝
 //! ```
 
-#![deny(unsafe_code)]  // Deny unsafe code by default (can be overridden in os module)
+#![deny(unsafe_code)] // Deny unsafe code by default (can be overridden in os module)
 #![warn(missing_docs, missing_debug_implementations, rust_2018_idioms)]
 #![doc(html_root_url = "https://docs.rs/kite/0.1.0")]
 
 //! Core modules
 
 pub mod args;
-pub mod style;
+pub mod log;
 pub mod progress;
 pub mod prompt;
-pub mod log;
+pub mod style;
 pub mod term;
 
 // Platform-specific code (unsafe allowed here)
@@ -84,10 +84,10 @@ pub(crate) mod os;
 
 // Re-export main components for easier access
 pub use args::Args;
-pub use style::{Color, Style};
+pub use log::{Level, Logger};
 pub use progress::ProgressBar;
 pub use prompt::Prompt;
-pub use log::{Logger, Level};
+pub use style::{Color, Style};
 pub use term::Terminal;
 
 /// Library version

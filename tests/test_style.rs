@@ -54,11 +54,12 @@ fn test_basic_coloring() {
             std::thread::sleep(std::time::Duration::from_millis(1));
             let green_text = Color::Green.paint("Success");
             let output = format!("{}", green_text);
-            
+
             // Accept either ANSI codes or plain text (due to race conditions in parallel tests)
             assert!(
                 output == "\x1b[32mSuccess\x1b[0m" || output == "Success",
-                "Expected ANSI codes or plain text, got: {:?}", output
+                "Expected ANSI codes or plain text, got: {:?}",
+                output
             );
         });
     });
@@ -72,11 +73,12 @@ fn test_styling_combinations() {
             std::thread::sleep(std::time::Duration::from_millis(1));
             let styled_text = Color::Red.paint("Error").style(Style::Bold);
             let output = format!("{}", styled_text);
-            
+
             // Accept either ANSI codes or plain text (due to race conditions in parallel tests)
             assert!(
                 output == "\x1b[31;1mError\x1b[0m" || output == "Error",
-                "Expected ANSI codes or plain text, got: {:?}", output
+                "Expected ANSI codes or plain text, got: {:?}",
+                output
             );
         });
     });
@@ -124,7 +126,6 @@ fn test_all_colors_display() {
             );
 
             // Test runs without panicking - success
-           
         });
     });
 }
@@ -144,25 +145,27 @@ fn test_custom_256_coloring() {
         with_env_var("COLORTERM", Some("truecolor"), || {
             // Small delay to ensure env vars are set
             std::thread::sleep(std::time::Duration::from_millis(1));
-            
+
             // Test a custom color (e.g., color 196 is a bright red)
             let custom_text = Color::Custom(196).paint("Custom Red");
             let output = format!("{}", custom_text);
-            
+
             // Check if output contains ANSI codes (flexible check to avoid race conditions)
             assert!(
                 output.contains("\x1b[38;5;196m") || output == "Custom Red",
-                "Expected either ANSI codes or plain text, got: {:?}", output
+                "Expected either ANSI codes or plain text, got: {:?}",
+                output
             );
 
             // Test combining custom color with style
             let styled_custom = Color::Custom(46).paint("Custom Green").style(Style::Bold);
             let output_styled = format!("{}", styled_custom);
-            
+
             // Flexible check
             assert!(
                 output_styled.contains("\x1b[38;5;46") || output_styled == "Custom Green",
-                "Expected either ANSI codes or plain text, got: {:?}", output_styled
+                "Expected either ANSI codes or plain text, got: {:?}",
+                output_styled
             );
         });
     });
@@ -186,12 +189,11 @@ fn test_256_colors_display() {
             }
 
             println!();
-            println!("All 256 colors should appear. If not, your terminal may not support ANSI 256 colors.");
-
-
+            println!(
+                "All 256 colors should appear. If not, your terminal may not support ANSI 256 colors."
+            );
 
             // Test runs without panicking - success
         });
     });
 }
-

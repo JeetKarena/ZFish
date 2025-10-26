@@ -67,16 +67,20 @@ impl Args {
     /// Parse command-line arguments from the environment.
     pub fn parse() -> Self {
         let mut args: Vec<String> = env::args().collect();
-        let command = if !args.is_empty() { args.remove(0) } else { String::new() };
-        
+        let command = if !args.is_empty() {
+            args.remove(0)
+        } else {
+            String::new()
+        };
+
         let mut positional = Vec::new();
         let mut flags = HashMap::new();
         let mut options = HashMap::new();
-        
+
         let mut i = 0;
         while i < args.len() {
             let arg = &args[i];
-            
+
             if let Some(without_prefix) = arg.strip_prefix("--") {
                 // Long option or flag
                 if without_prefix.contains('=') {
@@ -99,9 +103,12 @@ impl Args {
                     // Short flag(s): -v or -abc (multiple flags)
                     for (j, c) in without_prefix.chars().enumerate() {
                         let flag_name = c.to_string();
-                        
+
                         // If this is the last character and there's a next argument that's not a flag
-                        if j == without_prefix.len() - 1 && i + 1 < args.len() && !args[i + 1].starts_with('-') {
+                        if j == without_prefix.len() - 1
+                            && i + 1 < args.len()
+                            && !args[i + 1].starts_with('-')
+                        {
                             options.insert(flag_name, args[i + 1].clone());
                             i += 1; // Skip next arg as we used it
                             break;
@@ -114,10 +121,10 @@ impl Args {
                 // Positional argument
                 positional.push(arg.clone());
             }
-            
+
             i += 1;
         }
-        
+
         Args {
             command,
             positional,
@@ -125,12 +132,12 @@ impl Args {
             options,
         }
     }
-    
+
     /// Check if a flag is present
     pub fn has_flag(&self, name: &str) -> bool {
         self.flags.get(name).copied().unwrap_or(false)
     }
-    
+
     /// Get an option value or None if not present
     pub fn get_option(&self, name: &str) -> Option<&String> {
         self.options.get(name)

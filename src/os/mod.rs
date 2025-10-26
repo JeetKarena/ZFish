@@ -27,12 +27,12 @@ pub fn read_password() -> std::io::Result<String> {
     {
         windows::read_password()
     }
-    
+
     #[cfg(unix)]
     {
         unix::read_password()
     }
-    
+
     #[cfg(not(any(windows, unix)))]
     {
         // Fallback for other platforms

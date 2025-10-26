@@ -13,14 +13,14 @@ where
         Some(val) => unsafe { env::set_var(name, val) },
         None => unsafe { env::remove_var(name) },
     };
-    
+
     let result = f();
-    
+
     match original {
         Some(val) => unsafe { env::set_var(name, val) },
         None => unsafe { env::remove_var(name) },
     }
-    
+
     result
 }
 
@@ -32,7 +32,7 @@ where
     // This is a simplified stub - in real code, you would need to
     // redirect stdout which is more complex and platform-specific
     // For now, we just return a placeholder
-    
+
     f()?;
     Ok("Output captured (placeholder)".to_string())
 }

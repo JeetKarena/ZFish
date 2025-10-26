@@ -29,19 +29,19 @@ pub fn read_password() -> io::Result<String> {
         c_ispeed: u32,
         c_ospeed: u32,
     }
-    
+
     const ECHO: u32 = 0x00000008;
     const ECHONL: u32 = 0x00000040;
     const TCSANOW: i32 = 0;
-    
+
     unsafe extern "C" {
         fn tcgetattr(fd: i32, termios: *mut Termios) -> i32;
         fn tcsetattr(fd: i32, optional_actions: i32, termios: *const Termios) -> i32;
     }
-    
+
     let stdin_fd = io::stdin().as_raw_fd();
     let mut termios = std::mem::MaybeUninit::<Termios>::uninit();
-    
+
     // SAFETY: tcgetattr is called with a valid file descriptor and a properly
     // allocated termios struct. The FFI call is checked for errors.
     unsafe {
@@ -49,32 +49,32 @@ pub fn read_password() -> io::Result<String> {
         if tcgetattr(stdin_fd, termios.as_mut_ptr()) != 0 {
             return Err(io::Error::last_os_error());
         }
-        
+
         let mut termios = termios.assume_init();
         let original_lflag = termios.c_lflag;
-        
+
         // Disable echo
         termios.c_lflag &= !(ECHO | ECHONL);
-        
+
         // Set the new terminal attributes
         if tcsetattr(stdin_fd, TCSANOW, &termios) != 0 {
             return Err(io::Error::last_os_error());
         }
-        
+
         // Ensure we restore the terminal attributes even if reading fails
         struct TermiosResetter {
             fd: i32,
             original_lflag: u32,
             termios: Termios,
         }
-        
+
         impl Drop for TermiosResetter {
             fn drop(&mut self) {
                 // SAFETY: Restoring original termios settings
                 unsafe extern "C" {
                     fn tcsetattr(fd: i32, optional_actions: i32, termios: *const Termios) -> i32;
                 }
-                
+
                 self.termios.c_lflag = self.original_lflag;
                 unsafe {
                     // Restore original settings
@@ -83,17 +83,17 @@ pub fn read_password() -> io::Result<String> {
                 }
             }
         }
-        
+
         let _resetter = TermiosResetter {
             fd: stdin_fd,
             original_lflag,
             termios,
         };
-        
+
         // Read the password from stdin
         let mut password = String::new();
         io::stdin().read_line(&mut password)?;
-        
+
         // Remove trailing newline if present
         if password.ends_with('\n') {
             password.pop();
@@ -101,7 +101,7 @@ pub fn read_password() -> io::Result<String> {
                 password.pop();
             }
         }
-        
+
         Ok(password)
     }
 }

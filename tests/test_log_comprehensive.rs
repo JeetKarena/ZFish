@@ -1,7 +1,7 @@
 //! Comprehensive tests for Logger
 //! Tests all log levels, edge cases, Unicode, special characters
 
-use kite::log::{Logger, Level};
+use kite::log::{Level, Logger};
 
 #[test]
 fn test_logger_default_level() {
@@ -133,21 +133,21 @@ fn test_logger_level_filtering() {
     error_logger.warn("This should NOT appear");
     error_logger.info("This should NOT appear");
     error_logger.debug("This should NOT appear");
-    
+
     // Warn level should show errors and warnings
     let warn_logger = Logger::new().level(Level::Warn);
     warn_logger.error("Should appear");
     warn_logger.warn("Should appear");
     warn_logger.info("Should NOT appear");
     warn_logger.debug("Should NOT appear");
-    
+
     // Info level should show errors, warnings, and info
     let info_logger = Logger::new().level(Level::Info);
     info_logger.error("Should appear");
     info_logger.warn("Should appear");
     info_logger.info("Should appear");
     info_logger.debug("Should NOT appear");
-    
+
     // Debug level should show everything
     let debug_logger = Logger::new().level(Level::Debug);
     debug_logger.error("Should appear");
@@ -168,7 +168,7 @@ fn test_logger_rapid_logging() {
 fn test_logger_builder_pattern() {
     let logger1 = Logger::new().level(Level::Error);
     let logger2 = Logger::new().level(Level::Debug);
-    
+
     // Both should work independently
     logger1.error("Error logger");
     logger2.debug("Debug logger");
@@ -209,7 +209,7 @@ fn test_logger_multiple_instances() {
     let logger1 = Logger::new().level(Level::Error);
     let logger2 = Logger::new().level(Level::Debug);
     let logger3 = Logger::new().level(Level::Info);
-    
+
     logger1.error("Logger 1");
     logger2.debug("Logger 2");
     logger3.info("Logger 3");

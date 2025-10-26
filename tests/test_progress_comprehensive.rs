@@ -126,10 +126,10 @@ fn test_progress_bar_finish_with_newlines() {
 #[test]
 fn test_progress_bar_percentage_calculation() {
     let mut pb = ProgressBar::new(100);
-    pb.set(0);   // 0%
-    pb.set(25);  // 25%
-    pb.set(50);  // 50%
-    pb.set(75);  // 75%
+    pb.set(0); // 0%
+    pb.set(25); // 25%
+    pb.set(50); // 50%
+    pb.set(75); // 75%
     pb.set(100); // 100%
 }
 
@@ -143,8 +143,7 @@ fn test_progress_bar_non_divisible_total() {
 
 #[test]
 fn test_progress_bar_builder_pattern() {
-    let pb = ProgressBar::new(100)
-        .width(60);
+    let pb = ProgressBar::new(100).width(60);
     assert_eq!(pb.width, 60);
 }
 
@@ -152,7 +151,7 @@ fn test_progress_bar_builder_pattern() {
 fn test_progress_bar_width_chain() {
     let pb = ProgressBar::new(100)
         .width(50)
-        .width(60)  // Last one wins
+        .width(60) // Last one wins
         .width(70);
     assert_eq!(pb.width, 70);
 }

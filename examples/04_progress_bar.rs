@@ -13,9 +13,15 @@ fn main() {
         pb.set(i + 1);
     }
     pb.finish("✓ Complete!");
-    
+
     println!("\nExample 2: File processing simulation");
-    let files = ["file1.txt", "file2.txt", "file3.txt", "file4.txt", "file5.txt"];
+    let files = [
+        "file1.txt",
+        "file2.txt",
+        "file3.txt",
+        "file4.txt",
+        "file5.txt",
+    ];
     let mut pb = ProgressBar::new(files.len() as u64);
     for (i, file) in files.iter().enumerate() {
         thread::sleep(Duration::from_millis(500));
@@ -23,7 +29,7 @@ fn main() {
         println!("\nProcessed: {}", file);
     }
     pb.finish("✓ All files processed!");
-    
+
     println!("\nExample 3: Incremental progress");
     let mut pb = ProgressBar::new(50);
     for _ in 0..50 {
@@ -31,7 +37,7 @@ fn main() {
         pb.inc(1);
     }
     pb.finish("✓ Done!");
-    
+
     println!("\nExample 4: Custom width");
     let mut pb = ProgressBar::new(100).width(60);
     for i in 0..100 {
