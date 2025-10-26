@@ -34,7 +34,7 @@ pub fn read_password() -> io::Result<String> {
     const ECHONL: u32 = 0x00000040;
     const TCSANOW: i32 = 0;
     
-    extern "C" {
+    unsafe extern "C" {
         fn tcgetattr(fd: i32, termios: *mut Termios) -> i32;
         fn tcsetattr(fd: i32, optional_actions: i32, termios: *const Termios) -> i32;
     }
@@ -71,7 +71,7 @@ pub fn read_password() -> io::Result<String> {
         impl Drop for TermiosResetter {
             fn drop(&mut self) {
                 // SAFETY: Restoring original termios settings
-                extern "C" {
+                unsafe extern "C" {
                     fn tcsetattr(fd: i32, optional_actions: i32, termios: *const Termios) -> i32;
                 }
                 
