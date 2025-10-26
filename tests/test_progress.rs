@@ -1,4 +1,4 @@
-use kite::progress::ProgressBar;
+use kite_cli::progress::ProgressBar;
 
 #[test]
 fn test_progress_bar_creation() {

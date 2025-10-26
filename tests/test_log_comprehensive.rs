@@ -1,7 +1,7 @@
 //! Comprehensive tests for Logger
 //! Tests all log levels, edge cases, Unicode, special characters
 
-use kite::log::{Level, Logger};
+use kite_cli::log::{Level, Logger};
 
 #[test]
 fn test_logger_default_level() {

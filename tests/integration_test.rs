@@ -1,4 +1,4 @@
-use kite::{
+use kite_cli::{
     log::Logger,
     progress::ProgressBar,
     // Remove unused import: args::Args

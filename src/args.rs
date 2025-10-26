@@ -18,7 +18,7 @@
 //! ## Examples
 //!
 //! ```
-//! use kite::Args;
+//! use kite_cli::Args;
 //!
 //! let args = Args::parse();
 //!

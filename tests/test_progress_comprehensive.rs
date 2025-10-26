@@ -1,7 +1,7 @@
 //! Comprehensive tests for ProgressBar
 //! Tests edge cases, boundary values, performance
 
-use kite::ProgressBar;
+use kite_cli::ProgressBar;
 
 #[test]
 fn test_progress_bar_zero_total() {

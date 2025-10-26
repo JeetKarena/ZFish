@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Jeet Karena <karenajeet@proton.me>
-// Example: Hello World - Basic usage
+// Example 1: Hello World - The simplest Kite program
 
-use kite::style::Color;
+use kite_cli::style::Color;
 
 fn main() {
     // Simple colored output

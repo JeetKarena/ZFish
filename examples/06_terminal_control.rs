@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Jeet Karena <karenajeet@proton.me>
 // Example: Terminal Control - Cursor and screen manipulation
 
-use kite::term::Terminal;
+use kite_cli::term::Terminal;
 use std::thread;
 use std::time::Duration;
 

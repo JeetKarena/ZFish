@@ -1,4 +1,4 @@
-use kite::log::{Level, Logger};
+use kite_cli::log::{Level, Logger};
 
 #[test]
 fn test_logger_levels() {

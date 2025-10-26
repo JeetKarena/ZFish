@@ -1,7 +1,7 @@
 //! Comprehensive tests for Terminal module
 //! Tests cursor movement, screen clearing, positioning
 
-use kite::term::Terminal;
+use kite_cli::term::Terminal;
 
 #[test]
 fn test_terminal_clear_screen() {

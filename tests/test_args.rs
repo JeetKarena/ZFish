@@ -1,4 +1,4 @@
-use kite::Args;
+use kite_cli::Args;
 
 #[test]
 fn test_args_parsing() {

@@ -20,7 +20,7 @@
 //! ### Basic Colors
 //!
 //! ```
-//! use kite::Color;
+//! use kite_cli::Color;
 //!
 //! // Standard colors
 //! println!("{}", Color::Red.paint("Error!"));
@@ -34,7 +34,7 @@
 //! ### 256-Color Palette
 //!
 //! ```
-//! use kite::Color;
+//! use kite_cli::Color;
 //!
 //! // Custom 256 colors (0-255)
 //! println!("{}", Color::Custom(196).paint("Bright red"));
@@ -45,7 +45,7 @@
 //! ### Text Styling
 //!
 //! ```
-//! use kite::{Color, Style};
+//! use kite_cli::{Color, Style};
 //!
 //! // Combine colors and styles
 //! let text = Color::Red.paint("Error").style(Style::Bold);

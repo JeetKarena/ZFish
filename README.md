@@ -9,9 +9,9 @@
 </p>
 
 <p align="center">
-  <a href="https://crates.io/crates/kite"><img src="https://img.shields.io/crates/v/kite.svg" alt="Crates.io"/></a>
-  <a href="https://docs.rs/kite"><img src="https://docs.rs/kite/badge.svg" alt="Documentation"/></a>
-  <a href="https://github.com/jeetkarena/kite#license"><img src="https://img.shields.io/crates/l/kite.svg" alt="License"/></a>
+  <a href="https://crates.io/crates/kite-cli"><img src="https://img.shields.io/crates/v/kite-cli.svg" alt="Crates.io"/></a>
+  <a href="https://docs.rs/kite-cli"><img src="https://docs.rs/kite-cli/badge.svg" alt="Documentation"/></a>
+  <a href="https://github.com/jeetkarena/kite#license"><img src="https://img.shields.io/crates/l/kite-cli.svg" alt="License"/></a>
   <a href="https://blog.rust-lang.org/2023/06/01/Rust-1.70.0.html"><img src="https://img.shields.io/badge/MSRV-1.90-blue.svg" alt="MSRV"/></a>
   <a href="https://github.com/jeetkarena/kite/actions"><img src="https://github.com/jeetkarena/kite/workflows/CI/badge.svg" alt="CI Status"/></a>
 </p>
@@ -36,13 +36,13 @@ Add Kite to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-kite = "0.1"
+kite-cli = "0.1"
 ```
 
 ### Hello, Colorful World!
 
 ```rust
-use kite::Color;
+use kite_cli::Color;
 
 fn main() {
     println!("{}", Color::Green.paint("✓ Success!"));
@@ -54,7 +54,7 @@ fn main() {
 ### Argument Parsing
 
 ```rust
-use kite::Args;
+use kite_cli::Args;
 
 fn main() {
     let args = Args::parse();
@@ -76,7 +76,7 @@ fn main() {
 ### Progress Bar
 
 ```rust
-use kite::ProgressBar;
+use kite_cli::ProgressBar;
 use std::thread;
 use std::time::Duration;
 
@@ -95,7 +95,7 @@ fn main() {
 ### Interactive Prompts
 
 ```rust
-use kite::Prompt;
+use kite_cli::Prompt;
 
 fn main() {
     let name = Prompt::text("What's your name?");
@@ -113,7 +113,7 @@ fn main() {
 ### 256-Color Palette
 
 ```rust
-use kite::Color;
+use kite_cli::Color;
 
 fn main() {
     // Use any color from 0-255

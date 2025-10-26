@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Jeet Karena <karenajeet@proton.me>
 // Example: Progress Bar - Track long-running operations
 
-use kite::progress::ProgressBar;
+use kite_cli::progress::ProgressBar;
 use std::thread;
 use std::time::Duration;
 

@@ -29,7 +29,7 @@
 //! ## Quick Start
 //!
 //! ```rust
-//! use kite::{Args, Color};
+//! use kite_cli::{Args, Color};
 //!
 //! let args = Args::parse();
 //! if args.has_flag("verbose") {

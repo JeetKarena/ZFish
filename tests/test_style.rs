@@ -1,4 +1,4 @@
-use kite::style::{Color, Style};
+use kite_cli::style::{Color, Style};
 
 // Helper functions for testing the Kite library
 

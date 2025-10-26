@@ -1,4 +1,4 @@
-use kite::prompt::Prompt;
+use kite_cli::prompt::Prompt;
 
 // These tests require user input, so they're marked as #[ignore]
 // Run them explicitly with: cargo test -- --ignored

@@ -37,7 +37,7 @@ where
     Ok("Output captured (placeholder)".to_string())
 }
 
-use kite::style::{Color, Style};
+use kite_cli::style::{Color, Style};
 
 #[test]
 fn test_basic_coloring() {
