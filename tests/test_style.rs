@@ -8,17 +8,21 @@ where
     F: FnOnce() -> T,
 {
     let original = std::env::var(name).ok();
-    if let Some(v) = value {
-        unsafe { std::env::set_var(name, v) };
-    } else {
-        unsafe { std::env::remove_var(name) };
+    unsafe {
+        if let Some(v) = value {
+            std::env::set_var(name, v);
+        } else {
+            std::env::remove_var(name);
+        }
     }
 
     let result = f();
 
-    match original {
-        Some(val) => unsafe { std::env::set_var(name, val) },
-        None => unsafe { std::env::remove_var(name) },
+    unsafe {
+        match original {
+            Some(val) => std::env::set_var(name, val),
+            None => std::env::remove_var(name),
+        }
     }
 
     result
@@ -109,8 +113,7 @@ fn test_all_colors_display() {
                 "Colors should appear as expected. If not, your terminal may not support ANSI colors."
             );
 
-            // Basic assertion to ensure the test runs without panicking
-            assert!(true);
+            // Test runs without panicking - success
            
         });
     });
@@ -160,8 +163,10 @@ fn test_256_colors_display() {
             println!();
             println!("All 256 colors should appear. If not, your terminal may not support ANSI 256 colors.");
 
-            // Basic assertion to ensure the test runs without panicking
-            assert!(true);
+
+
+            // Test runs without panicking - success
         });
     });
 }
+

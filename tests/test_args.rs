@@ -1,24 +1,12 @@
-use kite::args::Args;
-use std::env;
+use kite::Args;
 
 #[test]
 fn test_args_parsing() {
-    // Save the original args (using underscore to indicate intentionally unused)
-    let _original_args: Vec<String> = env::args().collect();
+    // In a real application, env::args() would be populated
+    // This test demonstrates the API even though we can't mock env::args()
     
-    // Mock command-line arguments (using underscore to indicate intentionally unused)
-    let _test_args = vec![
-        "program".to_string(),
-        "--verbose".to_string(),
-        "-f".to_string(),
-        "file.txt".to_string(),
-        "--count=5".to_string(),
-        "positional1".to_string(),
-        "positional2".to_string(),
-    ];
-    
-    // Override env::args() behavior for testing
-    // Note: This doesn't actually modify env::args() in real code
+    // Parse the actual command line arguments (from cargo test)
+    let _args = Args::parse();
     // For a proper test, consider using a CLI args constructor that takes Vec<String>
     
     // For demonstration, we'll just create an Args instance manually

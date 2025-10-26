@@ -2,14 +2,25 @@
 name = "kite"
 version = "0.1.0"
 edition = "2024"
-authors = ["Jeet Karena <you@example.com>"]
-description = "A secure, dependency-free Rust library for building CLI tools"
-repository = "https://github.com/example/kite"
+rust-version = "1.90"
+authors = ["Jeet Karena <karenajeet@proton.me>"]
+description = "Ultra-light, zero-dependency Rust CLI framework for building beautiful command-line applications"
+repository = "https://github.com/jeetkarena/kite"
 license = "MIT"
-readme = ".github/instructions/README.md"
+readme = "README.md"
+keywords = ["cli", "terminal", "command-line", "argument-parser", "ansi"]
+categories = ["command-line-interface", "command-line-utilities"]
+
+[features]
+default = ["colour"]
+colour = []          # ANSI colour support
+raw = []             # Raw terminal mode
+progress = ["raw"]   # Progress bars need raw mode
+interactive = ["raw"] # Interactive prompts need raw mode
 
 [dependencies]
-# Intentionally empty — no third-party crates
+# Intentionally empty — zero third-party dependencies
+# This is a core feature of Kite: build powerful CLIs using only std library
 
 [dev-dependencies]
 # Even in tests, we maintain zero dependencies
@@ -17,6 +28,10 @@ readme = ".github/instructions/README.md"
 [[test]]
 name = "args_test"
 path = "tests/test_args.rs"
+
+[[test]]
+name = "args_comprehensive_test"
+path = "tests/test_args_comprehensive.rs"
 
 [[test]]
 name = "style_test"
@@ -27,6 +42,10 @@ name = "progress_test"
 path = "tests/test_progress.rs"
 
 [[test]]
+name = "progress_comprehensive_test"
+path = "tests/test_progress_comprehensive.rs"
+
+[[test]]
 name = "prompt_test"
 path = "tests/test_prompt.rs"
 
@@ -35,8 +54,16 @@ name = "logger_test"
 path = "tests/test_logger.rs"
 
 [[test]]
+name = "log_comprehensive_test"
+path = "tests/test_log_comprehensive.rs"
+
+[[test]]
 name = "term_test"
 path = "tests/test_term.rs"
+
+[[test]]
+name = "term_comprehensive_test"
+path = "tests/test_term_comprehensive.rs"
 
 [[test]]
 name = "integration_test"

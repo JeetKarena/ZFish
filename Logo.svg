@@ -1,0 +1,7 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Crescent = Yin, Kite = Yang -->
+  <path d="M64 20 A44 44 0 1 0 64 108 A30 30 0 1 1 64 50" fill="#1e1b4b"/>
+  <path d="M64 30L90 64L64 98L38 64Z" fill="#fbbf24"/>
+  <!-- Third-eye pupil -->
+  <circle cx="64" cy="64" r="5" fill="#ef4444"/>
+</svg>

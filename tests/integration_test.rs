@@ -27,6 +27,5 @@ fn test_combined_functionality() {
     
     logger.info("Integration test completed");
     
-    // Basic assertion to make the test pass
-    assert!(true);
+    // Test passes if we reach here without panicking
 }

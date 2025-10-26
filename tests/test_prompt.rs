@@ -19,9 +19,7 @@ fn test_confirm_prompt() {
     let result = Prompt::confirm("Accept default (yes)?", true).unwrap();
     println!("You entered: default ({}) -> {}", if result { "yes" } else { "no" }, result);
     
-    // Don't assert specific values since this is an interactive test
-    // Just make the test pass
-    assert!(true);
+    // Interactive test - success is reaching this point
 }
 
 #[test]

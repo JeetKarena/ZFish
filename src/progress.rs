@@ -4,9 +4,11 @@ use std::io::{self, Write};
 use std::time::Instant;
 
 /// A progress bar for displaying progress of operations.
+#[derive(Debug)]
 pub struct ProgressBar {
     total: u64,
     current: u64,
+    /// The width of the progress bar in characters (default: 40).
     pub width: u16,
     start_time: Instant,
 }
@@ -51,16 +53,19 @@ impl ProgressBar {
     
     /// Render the progress bar to stdout.
     fn render(&self) {
-        let percent = (self.current as f64 / self.total as f64) * 100.0;
-        let filled_width = (self.width as f64 * (self.current as f64 / self.total as f64)) as u16;
+        // Cap current at total to prevent overflow
+        let current = self.current.min(self.total);
+        
+        let percent = (current as f64 / self.total as f64) * 100.0;
+        let filled_width = (self.width as f64 * (current as f64 / self.total as f64)) as u16;
         let empty_width = self.width - filled_width;
         
         // Calculate elapsed time and estimate remaining time
         let elapsed = self.start_time.elapsed();
         let elapsed_secs = elapsed.as_secs_f64();
-        let items_per_sec = if elapsed_secs > 0.0 { self.current as f64 / elapsed_secs } else { 0.0 };
-        let remaining_secs = if items_per_sec > 0.0 { 
-            (self.total - self.current) as f64 / items_per_sec 
+        let items_per_sec = if elapsed_secs > 0.0 { current as f64 / elapsed_secs } else { 0.0 };
+        let remaining_secs = if items_per_sec > 0.0 && current < self.total { 
+            (self.total - current) as f64 / items_per_sec 
         } else { 
             0.0 
         };
@@ -71,7 +76,7 @@ impl ProgressBar {
             "=".repeat(filled_width as usize),
             " ".repeat(empty_width as usize),
             percent,
-            self.current,
+            current,
             self.total,
             items_per_sec,
             remaining_secs
@@ -79,8 +84,9 @@ impl ProgressBar {
         
         // Truncate if too long for terminal
         if let Some((width, _)) = terminal_size() {
-            if output.len() > width as usize {
-                output.truncate(width as usize);
+            let max_len = width as usize;
+            if output.len() > max_len {
+                output.truncate(max_len);
             }
         }
         

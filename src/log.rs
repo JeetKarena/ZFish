@@ -7,15 +7,26 @@ use crate::style::Color; // Removed unused Style import
 /// Log levels for different types of messages.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Level {
+    /// Error level - highest priority.
     Error,
+    /// Warning level.
     Warn,
+    /// Informational level.
     Info,
+    /// Debug level - lowest priority.
     Debug,
 }
 
 /// A simple logger for CLI applications.
+#[derive(Debug)]
 pub struct Logger {
     level: Level,
+}
+
+impl Default for Logger {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Logger {

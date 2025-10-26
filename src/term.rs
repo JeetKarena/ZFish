@@ -3,6 +3,7 @@
 use std::io::{self, Write};
 
 /// Terminal utilities for cursor manipulation and screen clearing.
+#[derive(Debug)]
 pub struct Terminal;
 
 impl Terminal {
