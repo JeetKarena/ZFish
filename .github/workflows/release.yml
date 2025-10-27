@@ -10,6 +10,7 @@ env:
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
   publish:
@@ -72,6 +73,51 @@ jobs:
       - name: Skip publishing
         if: steps.check_published.outputs.published == 'true'
         run: echo "⏭️  Skipping publish - version already exists on crates.io"
+      
+      - name: Publish to GitHub Packages
+        if: steps.check_published.outputs.published == 'false'
+        run: |
+          echo "📦 Publishing zfish to GitHub Packages..."
+          
+          # Create .cargo/config.toml for GitHub Packages registry
+          mkdir -p .cargo
+          cat > .cargo/config.toml << EOF
+          [registries.github]
+          index = "sparse+https://ghcr.io/JeetKarena/zfish/"
+          
+          [net]
+          git-fetch-with-cli = true
+          EOF
+          
+          # Publish to GitHub Packages using GITHUB_TOKEN
+          cargo publish --registry github --token ${{ secrets.GITHUB_TOKEN }} || echo "⚠️  GitHub Packages publish failed (this is optional)"
+        continue-on-error: true
+      
+      - name: Create package artifact
+        if: steps.check_published.outputs.published == 'false'
+        run: |
+          echo "📦 Creating package artifact..."
+          cargo package --list
+          
+          # Create artifacts directory
+          mkdir -p artifacts
+          
+          # Copy the packaged crate
+          CARGO_VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')
+          cp target/package/zfish-${CARGO_VERSION}.crate artifacts/
+          
+          # Create checksums
+          cd artifacts
+          sha256sum zfish-${CARGO_VERSION}.crate > zfish-${CARGO_VERSION}.crate.sha256
+          cd ..
+      
+      - name: Upload package to release
+        if: steps.check_published.outputs.published == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/zfish-*.crate
+            artifacts/zfish-*.sha256
       
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

@@ -1,0 +1,117 @@
+name: GitHub Packages
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish-package:
+    name: Publish to GitHub Packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract version
+        id: version
+        run: |
+          CARGO_VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')
+          echo "version=$CARGO_VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Package version: $CARGO_VERSION"
+      
+      - name: Build and package
+        run: |
+          cargo build --release
+          cargo package
+      
+      - name: Create package metadata
+        run: |
+          cat > package-metadata.json << EOF
+          {
+            "name": "zfish",
+            "version": "${{ steps.version.outputs.version }}",
+            "description": "Ultra-light, zero-dependency Rust CLI framework",
+            "repository": "https://github.com/JeetKarena/ZFish",
+            "homepage": "https://github.com/JeetKarena/ZFish",
+            "license": "MIT",
+            "rust_version": "1.90",
+            "published_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          
+          echo "📄 Package metadata:"
+          cat package-metadata.json
+      
+      - name: Upload to GitHub Packages
+        run: |
+          echo "📦 Uploading zfish-${{ steps.version.outputs.version }}.crate to GitHub Packages..."
+          
+          # GitHub Packages supports generic packages
+          # Upload the .crate file as a package artifact
+          gh release upload v${{ steps.version.outputs.version }} \
+            target/package/zfish-${{ steps.version.outputs.version }}.crate \
+            --clobber || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Create package checksums
+        run: |
+          cd target/package
+          sha256sum zfish-${{ steps.version.outputs.version }}.crate > zfish-${{ steps.version.outputs.version }}.crate.sha256
+          sha512sum zfish-${{ steps.version.outputs.version }}.crate > zfish-${{ steps.version.outputs.version }}.crate.sha512
+          
+          echo "✅ Checksums created:"
+          cat zfish-${{ steps.version.outputs.version }}.crate.sha256
+          cat zfish-${{ steps.version.outputs.version }}.crate.sha512
+      
+      - name: Publish checksums
+        run: |
+          gh release upload v${{ steps.version.outputs.version }} \
+            target/package/zfish-${{ steps.version.outputs.version }}.crate.sha256 \
+            target/package/zfish-${{ steps.version.outputs.version }}.crate.sha512 \
+            --clobber || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Summary
+        run: |
+          echo "## 📦 GitHub Packages Publication Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Package**: zfish" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Registry**: GitHub Packages" >> $GITHUB_STEP_SUMMARY
+          echo "- **Release**: [v${{ steps.version.outputs.version }}](https://github.com/JeetKarena/ZFish/releases/tag/v${{ steps.version.outputs.version }})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📥 Installation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "From crates.io:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`toml" >> $GITHUB_STEP_SUMMARY
+          echo "[dependencies]" >> $GITHUB_STEP_SUMMARY
+          echo "zfish = \"${{ steps.version.outputs.version }}\"" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "From GitHub Packages:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          echo "# Download the .crate file from GitHub Releases" >> $GITHUB_STEP_SUMMARY
+          echo "wget https://github.com/JeetKarena/ZFish/releases/download/v${{ steps.version.outputs.version }}/zfish-${{ steps.version.outputs.version }}.crate" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY

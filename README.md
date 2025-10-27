@@ -14,6 +14,7 @@
   <a href="https://github.com/JeetKarena/ZFish/blob/main/LICENSE"><img src="https://img.shields.io/crates/l/zfish.svg" alt="License"/></a>
   <a href="https://blog.rust-lang.org/2023/06/01/Rust-1.70.0.html"><img src="https://img.shields.io/badge/MSRV-1.90-blue.svg" alt="MSRV"/></a>
   <a href="https://github.com/JeetKarena/ZFish/actions"><img src="https://github.com/JeetKarena/ZFish/workflows/CI/badge.svg" alt="CI Status"/></a>
+  <a href="https://github.com/JeetKarena/ZFish/releases"><img src="https://img.shields.io/badge/GitHub_Packages-Published-success.svg" alt="GitHub Packages"/></a>
 </p>
 
 <p align="center">
@@ -41,11 +42,29 @@
 
 ## 🚀 Quick Start
 
+### Installation
+
 Add zfish to your `Cargo.toml`:
 
 ```toml
 [dependencies]
 zfish = "0.1"
+```
+
+**Alternative: Install from GitHub Packages**
+
+Download the `.crate` file from [GitHub Releases](https://github.com/JeetKarena/ZFish/releases):
+
+```bash
+# Download the latest release
+wget https://github.com/JeetKarena/ZFish/releases/download/v0.1.8/zfish-0.1.8.crate
+
+# Verify checksum (optional)
+wget https://github.com/JeetKarena/ZFish/releases/download/v0.1.8/zfish-0.1.8.crate.sha256
+sha256sum -c zfish-0.1.8.crate.sha256
+
+# Install from local crate
+cargo install --path zfish-0.1.8.crate
 ```
 
 ### Hello, Colorful World!
@@ -146,6 +165,7 @@ fn main() {
 
 - **API Docs**: [docs.rs/zfish](https://docs.rs/zfish)
 - **Roadmap**: [ROADMAP.md](./ROADMAP.md)
+- **GitHub Packages**: [PACKAGES.md](./PACKAGES.md) — Installation from GitHub Releases
 - **Examples**: [examples/](./examples/) — 8 comprehensive examples covering all features
   - `01_hello_world.rs` — Basic usage
   - `02_argument_parsing.rs` — CLI argument handling
