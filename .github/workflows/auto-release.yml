@@ -1,0 +1,151 @@
+name: Auto Version Bump & Release
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+
+jobs:
+  bump-and-release:
+    runs-on: ubuntu-latest
+    # Skip if commit message contains [skip ci] or [no release]
+    if: |
+      github.ref == 'refs/heads/main' && 
+      !contains(github.event.head_commit.message, '[skip ci]') &&
+      !contains(github.event.head_commit.message, '[no release]')
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Analyze commits for version bump type
+        id: version_type
+        run: |
+          # Get the last commit message if not manually triggered
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            BUMP_TYPE="${{ github.event.inputs.version_type }}"
+            echo "Manual trigger - using: $BUMP_TYPE"
+          else
+            COMMIT_MSG="${{ github.event.head_commit.message }}"
+            
+            # Determine bump type from commit message
+            # Major: BREAKING CHANGE, breaking:, major:, feat!:, fix!:
+            # Minor: feat:, feature:, minor:
+            # Patch: fix:, patch:, chore:, docs:, style:, refactor:, perf:, test:, build:, ci:
+            
+            if echo "$COMMIT_MSG" | grep -qiE '^(BREAKING CHANGE|breaking:|major:|feat!:|fix!:)'; then
+              BUMP_TYPE="major"
+              echo "Detected BREAKING CHANGE → major version bump"
+            elif echo "$COMMIT_MSG" | grep -qiE '^(feat:|feature:|minor:)'; then
+              BUMP_TYPE="minor"
+              echo "Detected feature → minor version bump"
+            elif echo "$COMMIT_MSG" | grep -qiE '^(fix:|patch:|chore:|docs:|style:|refactor:|perf:|test:|build:|ci:)'; then
+              BUMP_TYPE="patch"
+              echo "Detected fix/other → patch version bump"
+            else
+              # Default to patch for any other changes
+              BUMP_TYPE="patch"
+              echo "No conventional commit prefix → defaulting to patch"
+            fi
+          fi
+          
+          echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+
+      - name: Get current version and calculate next
+        id: version
+        run: |
+          CURRENT=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+          
+          IFS='.' read -r major minor patch <<< "$CURRENT"
+          BUMP_TYPE="${{ steps.version_type.outputs.bump_type }}"
+          
+          case $BUMP_TYPE in
+            major)
+              NEXT="$((major+1)).0.0"
+              ;;
+            minor)
+              NEXT="$major.$((minor+1)).0"
+              ;;
+            patch)
+              NEXT="$major.$minor.$((patch+1))"
+              ;;
+          esac
+          
+          echo "next=$NEXT" >> $GITHUB_OUTPUT
+          echo "📦 Version bump: $CURRENT → $NEXT ($BUMP_TYPE)"
+
+      - name: Check if version already exists on crates.io
+        id: check_published
+        run: |
+          NEXT_VERSION="${{ steps.version.outputs.next }}"
+          if cargo search zfish --limit 1 | grep -q "zfish = \"$NEXT_VERSION\""; then
+            echo "published=true" >> $GITHUB_OUTPUT
+            echo "⚠️  Version $NEXT_VERSION already exists on crates.io"
+            echo "⚠️  Skipping release to avoid duplicate publish attempt"
+          else
+            echo "published=false" >> $GITHUB_OUTPUT
+            echo "✅ Version $NEXT_VERSION is available for publishing"
+          fi
+
+      - name: Update Cargo.toml version
+        if: steps.check_published.outputs.published == 'false'
+        run: |
+          NEXT="${{ steps.version.outputs.next }}"
+          sed -i "s/^version = \".*\"/version = \"$NEXT\"/" Cargo.toml
+          echo "✅ Updated Cargo.toml to version $NEXT"
+
+      - name: Update lock file
+        if: steps.check_published.outputs.published == 'false'
+        run: cargo update -p zfish
+
+      - name: Run tests before release
+        if: steps.check_published.outputs.published == 'false'
+        run: |
+          echo "🧪 Running tests before creating release..."
+          cargo test --all --verbose
+
+      - name: Commit version bump
+        if: steps.check_published.outputs.published == 'false'
+        run: |
+          NEXT="${{ steps.version.outputs.next }}"
+          BUMP_TYPE="${{ steps.version_type.outputs.bump_type }}"
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Cargo.toml Cargo.lock
+          git commit -m "chore: bump version to v$NEXT ($BUMP_TYPE) [skip ci]"
+          git push origin main
+
+      - name: Create and push tag
+        if: steps.check_published.outputs.published == 'false'
+        run: |
+          NEXT="${{ steps.version.outputs.next }}"
+          git tag "v$NEXT"
+          git push origin "v$NEXT"
+          echo "🏷️  Created and pushed tag v$NEXT"
+          echo "🚀 This will trigger the Release workflow to publish to crates.io"
+
+      - name: Skip release
+        if: steps.check_published.outputs.published == 'true'
+        run: |
+          echo "⏭️  Skipping release - version already published"
+          echo "💡 This prevents duplicate version errors on crates.io"
