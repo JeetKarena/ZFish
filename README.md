@@ -16,6 +16,14 @@
   <a href="https://github.com/JeetKarena/ZFish/actions"><img src="https://github.com/JeetKarena/ZFish/workflows/CI/badge.svg" alt="CI Status"/></a>
 </p>
 
+<p align="center">
+  <a href="https://sonarcloud.io/dashboard?id=JeetKarena_ZFish"><img src="https://sonarcloud.io/api/project_badges/measure?project=JeetKarena_ZFish&metric=alert_status" alt="Quality Gate"/></a>
+  <a href="https://sonarcloud.io/dashboard?id=JeetKarena_ZFish"><img src="https://sonarcloud.io/api/project_badges/measure?project=JeetKarena_ZFish&metric=security_rating" alt="Security Rating"/></a>
+  <a href="https://sonarcloud.io/dashboard?id=JeetKarena_ZFish"><img src="https://sonarcloud.io/api/project_badges/measure?project=JeetKarena_ZFish&metric=sqale_rating" alt="Maintainability Rating"/></a>
+  <a href="https://sonarcloud.io/dashboard?id=JeetKarena_ZFish"><img src="https://sonarcloud.io/api/project_badges/measure?project=JeetKarena_ZFish&metric=coverage" alt="Coverage"/></a>
+  <a href="https://sonarcloud.io/dashboard?id=JeetKarena_ZFish"><img src="https://sonarcloud.io/api/project_badges/measure?project=JeetKarena_ZFish&metric=bugs" alt="Bugs"/></a>
+</p>
+
 ---
 
 ## ✨ Features
