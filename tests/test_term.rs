@@ -3,7 +3,7 @@ use zfish::term::Terminal;
 #[test]
 fn test_terminal_size() {
     let size = Terminal::size();
-    
+
     // In CI environments without a TTY, size() may return None
     // This is expected behavior, not a failure
     match size {

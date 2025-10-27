@@ -1,9 +1,9 @@
 // Copyright (c) 2025 Jeet Karena <karenajeet@proton.me>
 // Example: Progress Bar - Track long-running operations with different styles
 
-use zfish::{ProgressBar, ProgressStyle};
 use std::thread;
 use std::time::Duration;
+use zfish::{ProgressBar, ProgressStyle};
 
 fn main() {
     println!("=== zfish Progress Bar Styles Demo ===\n");
@@ -55,7 +55,9 @@ fn main() {
 
     // Example 6: Custom width with Spinner
     println!("\nExample 6: Custom width (60 chars, Spinner)");
-    let mut pb = ProgressBar::new(80).width(60).with_style(ProgressStyle::Spinner);
+    let mut pb = ProgressBar::new(80)
+        .width(60)
+        .with_style(ProgressStyle::Spinner);
     for i in 0..=80 {
         thread::sleep(Duration::from_millis(15));
         pb.set(i);

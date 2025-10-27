@@ -3,14 +3,13 @@
 
 use zfish::style::Color;
 
-    // Simple colored output
-    // Copyright (c) 2025 Jeet Karena <karenajeet@proton.me>
+// Simple colored output
+// Copyright (c) 2025 Jeet Karena <karenajeet@proton.me>
 // Example 1: Hello World - The simplest zfish program
-
 
 fn main() {
     println!("{}", Color::Green.paint("Hello, zfish! 🐟"));
-    
+
     // Multiple colors
     println!(
         "{} {} {}",
@@ -24,5 +23,4 @@ fn main() {
 
     // Custom 256 colors
     println!("{}", Color::Custom(208).paint("Orange (256-color palette)"));
-    
 }

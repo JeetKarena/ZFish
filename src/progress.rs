@@ -4,9 +4,10 @@ use std::io::{self, Write};
 use std::time::Instant;
 
 /// Progress bar style (visual appearance)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum ProgressStyle {
     /// Classic style: [==========          ] (default)
+    #[default]
     Classic,
     /// Arrow style: [=========>            ]
     Arrow,
@@ -14,12 +15,6 @@ pub enum ProgressStyle {
     Dots,
     /// Spinner style: [/|/|/|/|            ]
     Spinner,
-}
-
-impl Default for ProgressStyle {
-    fn default() -> Self {
-        ProgressStyle::Classic
-    }
 }
 
 /// A progress bar for displaying progress of operations.

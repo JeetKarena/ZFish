@@ -113,12 +113,14 @@ pub fn get_terminal_size() -> Option<(u16, u16)> {
     // Windows API constants
     const STD_OUTPUT_HANDLE: u32 = 0xFFFFFFF5;
 
+    #[allow(non_camel_case_types, clippy::upper_case_acronyms)]
     #[repr(C)]
     struct COORD {
         x: i16,
         y: i16,
     }
 
+    #[allow(non_camel_case_types, clippy::upper_case_acronyms)]
     #[repr(C)]
     struct SMALL_RECT {
         left: i16,
@@ -127,6 +129,7 @@ pub fn get_terminal_size() -> Option<(u16, u16)> {
         bottom: i16,
     }
 
+    #[allow(non_camel_case_types, clippy::upper_case_acronyms)]
     #[repr(C)]
     struct CONSOLE_SCREEN_BUFFER_INFO {
         dw_size: COORD,

@@ -1,9 +1,9 @@
 // Copyright (c) 2025 Jeet Karena <karenajeet@proton.me>
 // Example: Terminal Control - Cursor and screen manipulation
 
-use zfish::term::Terminal;
 use std::thread;
 use std::time::Duration;
+use zfish::term::Terminal;
 
 fn main() {
     println!("Example 1: Terminal size");

@@ -1,9 +1,9 @@
 // Copyright (c) 2025 Jeet Karena <karenajeet@proton.me>
 // Example: Complete CLI - Putting it all together
 
-use zfish::{Args, Color, Level, Logger, ProgressBar, Style};
 use std::thread;
 use std::time::Duration;
+use zfish::{Args, Color, Level, Logger, ProgressBar, Style};
 
 fn main() {
     let args = Args::parse();

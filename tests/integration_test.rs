@@ -1,11 +1,11 @@
+use std::thread;
+use std::time::Duration;
 use zfish::{
     log::Logger,
     progress::ProgressBar,
     // Remove unused import: args::Args
     style::{Color, Style},
 };
-use std::thread;
-use std::time::Duration;
 
 #[test]
 #[ignore]
