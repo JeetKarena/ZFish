@@ -11,7 +11,7 @@
 <p align="center">
   <a href="https://crates.io/crates/zfish"><img src="https://img.shields.io/crates/v/zfish.svg" alt="Crates.io"/></a>
   <a href="https://docs.rs/zfish"><img src="https://docs.rs/zfish/badge.svg" alt="Documentation"/></a>
-  <a href="https://github.com/JeetKarena/ZFish#license"><img src="https://img.shields.io/crates/l/zfish.svg" alt="License"/></a>
+  <a href="https://github.com/JeetKarena/ZFish/blob/main/LICENSE"><img src="https://img.shields.io/crates/l/zfish.svg" alt="License"/></a>
   <a href="https://blog.rust-lang.org/2023/06/01/Rust-1.70.0.html"><img src="https://img.shields.io/badge/MSRV-1.90-blue.svg" alt="MSRV"/></a>
   <a href="https://github.com/JeetKarena/ZFish/actions"><img src="https://github.com/JeetKarena/ZFish/workflows/CI/badge.svg" alt="CI Status"/></a>
 </p>
