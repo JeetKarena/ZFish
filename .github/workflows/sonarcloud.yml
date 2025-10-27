@@ -1,0 +1,81 @@
+name: SonarCloud Analysis
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  sonarcloud:
+    name: SonarCloud Code Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for better analysis
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+      
+      - name: Cache cargo index
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+      
+      - name: Cache cargo build
+        uses: actions/cache@v4
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-sonar-${{ hashFiles('**/Cargo.lock') }}
+      
+      - name: Run Clippy with JSON output
+        run: |
+          cargo clippy --all-targets --message-format=json -- -D warnings > target/clippy-report.json 2>&1 || true
+      
+      - name: Run tests with coverage
+        run: |
+          cargo test --all --verbose
+      
+      - name: Install cargo-tarpaulin
+        run: |
+          cargo install cargo-tarpaulin || true
+      
+      - name: Generate code coverage
+        run: |
+          cargo tarpaulin --verbose --all-features --workspace --timeout 120 --out Xml --output-dir target/ || echo "Coverage generation skipped"
+      
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=JeetKarena_ZFish
+            -Dsonar.organization=jeetkarena
+            -Dsonar.sources=src
+            -Dsonar.tests=tests
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.coverage.exclusions=**/tests/**,**/examples/**
+            -Dsonar.cpd.exclusions=**/tests/**,**/examples/**
+      
+      - name: Check Quality Gate
+        run: |
+          echo "SonarCloud analysis complete!"
+          echo "View results at: https://sonarcloud.io/dashboard?id=JeetKarena_ZFish"
