@@ -6,14 +6,14 @@ use std::time::Instant;
 /// Progress bar style (visual appearance)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum ProgressStyle {
-    /// Classic style: [==========          ] (default)
+    /// Classic style: `[==========          ]` (default)
     #[default]
     Classic,
-    /// Arrow style: [=========>            ]
+    /// Arrow style: `[=========>            ]`
     Arrow,
-    /// Dots style: [**********            ]
+    /// Dots style: `[**********            ]`
     Dots,
-    /// Spinner style: [/|/|/|/|            ]
+    /// Spinner style: `[/|/|/|/|            ]`
     Spinner,
 }
 
