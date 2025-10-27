@@ -6,10 +6,15 @@ rust-version = "1.90"
 authors = ["Jeet Karena <karenajeet@proton.me>"]
 description = "Ultra-light, zero-dependency Rust CLI framework for building beautiful command-line applications"
 repository = "https://github.com/JeetKarena/ZFish.git"
+homepage = "https://github.com/JeetKarena/ZFish"
 license = "MIT"
 readme = "README.md"
 keywords = ["cli", "terminal", "command-line", "argument-parser", "ansi"]
 categories = ["command-line-interface", "command-line-utilities"]
+documentation = "https://docs.rs/zfish"
+
+[package.metadata]
+twitter = "https://x.com/user_0xJeet"
 
 [features]
 default = ["colour"]
