@@ -3,12 +3,19 @@ use zfish::term::Terminal;
 #[test]
 fn test_terminal_size() {
     let size = Terminal::size();
-    assert!(size.is_some());
-
-    if let Some((width, height)) = size {
-        assert!(width > 0);
-        assert!(height > 0);
-        println!("Terminal size: {}x{}", width, height);
+    
+    // In CI environments without a TTY, size() may return None
+    // This is expected behavior, not a failure
+    match size {
+        Some((width, height)) => {
+            assert!(width > 0);
+            assert!(height > 0);
+            println!("Terminal size: {}x{}", width, height);
+        }
+        None => {
+            println!("No terminal detected (likely running in CI/non-TTY environment)");
+            // This is acceptable - the function works correctly by returning None
+        }
     }
 }
 
