@@ -108,10 +108,11 @@ mod tests {
     fn version_is_set() {
         // Verify VERSION matches Cargo.toml version
         assert_eq!(VERSION, env!("CARGO_PKG_VERSION"));
-        // Ensure it's a valid semver format
-        assert!(VERSION.chars().filter(|c| *c == '.').count() == 2, "Version should have format X.Y.Z");
-        // Ensure it's not empty
-        assert!(!VERSION.is_empty(), "Version should not be empty");
+        // Ensure it's a valid semver format (X.Y.Z)
+        assert!(
+            VERSION.chars().filter(|c| *c == '.').count() == 2,
+            "Version should have format X.Y.Z"
+        );
     }
 
     #[test]
