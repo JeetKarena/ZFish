@@ -1,6 +1,6 @@
 [package]
 name = "zfish"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2024"
 rust-version = "1.90"
 authors = ["Jeet Karena <karenajeet@proton.me>"]
