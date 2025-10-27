@@ -35,6 +35,7 @@
 - 🌍 **Cross-Platform** — Linux, macOS, Windows (tier-1 support)
 - 📦 **Lightweight** — Minimal binary size, fast compile times
 - 🎯 **Intuitive API** — Ergonomic design, great docs
+- 🔮 **Edition 2024** — Built with the latest Rust features
 
 ---
 
@@ -145,7 +146,15 @@ fn main() {
 
 - **API Docs**: [docs.rs/zfish](https://docs.rs/zfish)
 - **Roadmap**: [ROADMAP.md](./ROADMAP.md)
-- **Examples**: [examples/](./examples/) (coming soon)
+- **Examples**: [examples/](./examples/) — 8 comprehensive examples covering all features
+  - `01_hello_world.rs` — Basic usage
+  - `02_argument_parsing.rs` — CLI argument handling
+  - `03_colored_text.rs` — 16 + 256 color palette
+  - `04_progress_bar.rs` — 4 progress bar styles
+  - `05_logger.rs` — Leveled logging
+  - `06_terminal_control.rs` — Terminal manipulation
+  - `07_interactive_prompts.rs` — User input
+  - `08_complete_cli.rs` — Full-featured CLI app
 
 ---
 
@@ -185,25 +194,30 @@ zfish takes a different approach:
 
 ## 🏗️ Project Status
 
-**Current Version**: `0.1.0` (Foundation Release)
+**Current Version**: `0.1.8` (Active Development)
 
 See [ROADMAP.md](./ROADMAP.md) for detailed version plans.
 
-### Completed Features (v0.1.0)
+### Completed Features (v0.1.x)
 - ✅ 16 standard ANSI colors
-- ✅ 256-color palette
-- ✅ Text styling (bold, italic, underline, etc.)
-- ✅ Basic argument parser
-- ✅ Progress bars
-- ✅ Interactive prompts
-- ✅ Terminal control utilities
-- ✅ Leveled logging
+- ✅ 256-color palette (0-255)
+- ✅ Text styling (bold, italic, underline, dim, blink, reverse, hidden, strikethrough)
+- ✅ Argument parser (flags, options, positional args)
+- ✅ 4 progress bar styles (bar, spinner, dots, arrows)
+- ✅ Interactive prompts (text, confirm, password)
+- ✅ Terminal control (clear screen, cursor movement)
+- ✅ Terminal size detection (Windows + Unix)
+- ✅ Leveled logging (error, warn, info, debug, trace)
+- ✅ Feature flags (colour, raw, progress, interactive)
+- ✅ Edition 2024 support
+- ✅ 8 comprehensive examples
 
 ### Coming Next (v0.2.0)
-- 🔨 Subcommand support
-- 🔨 Auto-generated `--help`
-- 🔨 Argument validation
+- 🔨 Subcommand support (git-style)
+- 🔨 Auto-generated `--help` text
+- 🔨 Argument validation & custom types
 - 🔨 Fuzzing tests
+- 🔨 Multi-select prompts
 
 ---
 
@@ -218,12 +232,14 @@ default-features = false  # Disable all defaults
 features = ["colour"]     # Enable only what you need
 ```
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `colour` | ✅ | ANSI color support |
-| `raw` | ❌ | Raw terminal mode (coming in 0.3.0) |
-| `progress` | ❌ | Progress bars (coming in 0.4.0) |
-| `interactive` | ❌ | Interactive prompts (coming in 0.3.0) |
+| Flag | Default | Description | Status |
+|------|---------|-------------|--------|
+| `colour` | ✅ | ANSI color support (16 + 256 colors) | ✅ Available |
+| `raw` | ❌ | Raw terminal mode for advanced I/O | ✅ Available |
+| `progress` | ❌ | Progress bars (4 styles: bar, spinner, dots, arrows) | ✅ Available |
+| `interactive` | ❌ | Interactive prompts (text, password, confirm) | ✅ Available |
+
+**Note**: `progress` and `interactive` features require `raw` mode and are automatically enabled when you use them.
 
 ---
 
@@ -252,8 +268,15 @@ cargo test -- --test-threads=1
 # Build documentation
 cargo doc --open
 
-# Run examples (coming soon)
-cargo run --example basic_colors
+# Run examples
+cargo run --example 01_hello_world
+cargo run --example 02_argument_parsing
+cargo run --example 03_colored_text
+cargo run --example 04_progress_bar
+cargo run --example 05_logger
+cargo run --example 06_terminal_control
+cargo run --example 07_interactive_prompts
+cargo run --example 08_complete_cli
 ```
 
 ---
@@ -315,7 +338,7 @@ Built with zero dependencies as a proof-of-concept that powerful CLIs don't need
 
 - **GitHub Discussions** — Ask questions, share ideas
 - **Issues** — Report bugs, request features
-- **Twitter** — Follow [@jeetkarena](https://twitter.com/jeetkarena) for updates
+- **Twitter** — Follow [@user_0xJeet](https://x.com/user_0xJeet) for updates
 
 ---
 
@@ -331,7 +354,7 @@ Built with zero dependencies as a proof-of-concept that powerful CLIs don't need
 
 ```text
 ╔═══════════════════════════════════════════════════════════════╗
-║  zfish v0.1.0                                                  ║
+║  zfish v0.1.8                                                  ║
 ║  Copyright © 2025 Jeet Karena                                 ║
 ║  Licensed under MIT OR Apache-2.0                             ║
 ╚═══════════════════════════════════════════════════════════════╝
