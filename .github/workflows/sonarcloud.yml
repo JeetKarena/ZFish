@@ -69,7 +69,7 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=JeetKarena_ZFish
-            -Dsonar.organization=jeetkarena
+            -Dsonar.organization=jeetkarena01
       
       - name: Check Quality Gate
         run: |
