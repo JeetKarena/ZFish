@@ -25,10 +25,7 @@ impl Terminal {
 
     /// Get the terminal size (width, height) if available.
     pub fn size() -> Option<(u16, u16)> {
-        // This is a simplified version. A real implementation would
-        // use platform-specific code to detect terminal size.
-        // For now, we'll just return a default size.
-        Some((80, 24))
+        crate::os::get_terminal_size()
     }
 
     /// Print text at the specified position.

@@ -1,4 +1,4 @@
-use kite_cli::log::{Level, Logger};
+use zfish::log::{Level, Logger};
 
 #[test]
 fn test_logger_levels() {

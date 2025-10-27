@@ -3,6 +3,25 @@
 use std::io::{self, Write};
 use std::time::Instant;
 
+/// Progress bar style (visual appearance)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProgressStyle {
+    /// Classic style: [==========          ] (default)
+    Classic,
+    /// Arrow style: [=========>            ]
+    Arrow,
+    /// Dots style: [**********            ]
+    Dots,
+    /// Spinner style: [/|/|/|/|            ]
+    Spinner,
+}
+
+impl Default for ProgressStyle {
+    fn default() -> Self {
+        ProgressStyle::Classic
+    }
+}
+
 /// A progress bar for displaying progress of operations.
 #[derive(Debug)]
 pub struct ProgressBar {
@@ -10,7 +29,10 @@ pub struct ProgressBar {
     current: u64,
     /// The width of the progress bar in characters (default: 40).
     pub width: u16,
+    /// The style of the progress bar
+    pub style: ProgressStyle,
     start_time: Instant,
+    spinner_frame: usize,
 }
 
 impl ProgressBar {
@@ -20,13 +42,21 @@ impl ProgressBar {
             total,
             current: 0,
             width: 40, // Default width
+            style: ProgressStyle::default(),
             start_time: Instant::now(),
+            spinner_frame: 0,
         }
     }
 
     /// Set the width of the progress bar.
     pub fn width(mut self, width: u16) -> Self {
         self.width = width;
+        self
+    }
+
+    /// Set the style of the progress bar.
+    pub fn with_style(mut self, style: ProgressStyle) -> Self {
+        self.style = style;
         self
     }
 
@@ -52,7 +82,7 @@ impl ProgressBar {
     }
 
     /// Render the progress bar to stdout.
-    fn render(&self) {
+    fn render(&mut self) {
         // Cap current at total to prevent overflow
         let current = self.current.min(self.total);
 
@@ -74,20 +104,17 @@ impl ProgressBar {
             0.0
         };
 
+        // Build the progress bar based on style
+        let bar = self.build_bar(filled_width, empty_width);
+
         // Format the progress bar
         let mut output = format!(
-            "\r[{}{}] {:.1}% ({}/{}) {:.1}/s ETA: {:.1}s",
-            "=".repeat(filled_width as usize),
-            " ".repeat(empty_width as usize),
-            percent,
-            current,
-            self.total,
-            items_per_sec,
-            remaining_secs
+            "\r[{}] {:.1}% ({}/{}) {:.1}/s ETA: {:.1}s",
+            bar, percent, current, self.total, items_per_sec, remaining_secs
         );
 
         // Truncate if too long for terminal
-        if let Some((width, _)) = terminal_size() {
+        if let Some((width, _)) = crate::term::Terminal::size() {
             let max_len = width as usize;
             if output.len() > max_len {
                 output.truncate(max_len);
@@ -100,12 +127,56 @@ impl ProgressBar {
         let _ = handle.write_all(output.as_bytes());
         let _ = handle.flush();
     }
-}
 
-/// Get the terminal size (width, height) if available.
-fn terminal_size() -> Option<(u16, u16)> {
-    // This is a simplified version. A real implementation would
-    // use platform-specific code to detect terminal size.
-    // For now, we'll just return a default size.
-    Some((80, 24))
+    /// Build the progress bar string based on the selected style
+    fn build_bar(&mut self, filled_width: u16, empty_width: u16) -> String {
+        match self.style {
+            ProgressStyle::Classic => {
+                // [==========          ]
+                format!(
+                    "{}{}",
+                    "=".repeat(filled_width as usize),
+                    " ".repeat(empty_width as usize)
+                )
+            }
+            ProgressStyle::Arrow => {
+                // [=========>          ]
+                if filled_width == 0 {
+                    " ".repeat(self.width as usize)
+                } else if filled_width >= self.width {
+                    "=".repeat(self.width as usize)
+                } else {
+                    format!(
+                        "{}>{}",
+                        "=".repeat((filled_width - 1) as usize),
+                        " ".repeat(empty_width as usize)
+                    )
+                }
+            }
+            ProgressStyle::Dots => {
+                // [**********          ]
+                format!(
+                    "{}{}",
+                    "*".repeat(filled_width as usize),
+                    " ".repeat(empty_width as usize)
+                )
+            }
+            ProgressStyle::Spinner => {
+                // [/|/|/|/|            ]  (animated)
+                const SPINNER_CHARS: &[char] = &['/', '|', '\\', '|'];
+                self.spinner_frame = (self.spinner_frame + 1) % SPINNER_CHARS.len();
+                let spinner_char = SPINNER_CHARS[self.spinner_frame];
+
+                let mut bar = String::with_capacity(self.width as usize);
+                for i in 0..self.width {
+                    if i < filled_width {
+                        bar.push(spinner_char);
+                    } else {
+                        bar.push(' ');
+                    }
+                }
+                bar
+            }
+        }
+    }
 }

@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2025-10-26
 
 ### Added
-- Initial release of Kite CLI framework
+- Initial release of zfish CLI framework
 - Zero-dependency argument parsing with `Args`
 - ANSI color support with 16 standard colors + 256-color palette
 - Text styling (bold, italic, underline, dim, blink, reverse, hidden)
@@ -31,5 +31,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rust 2024 Edition
 - MSRV: 1.90.0
 
-[Unreleased]: https://github.com/jeetkarena/kite/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/jeetkarena/kite/releases/tag/v0.1.0
+[Unreleased]: https://github.com/jeetkarena/zfish/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/jeetkarena/zfish/releases/tag/v0.1.0

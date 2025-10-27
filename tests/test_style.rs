@@ -1,6 +1,6 @@
-use kite_cli::style::{Color, Style};
+use zfish::style::{Color, Style};
 
-// Helper functions for testing the Kite library
+// Helper functions for testing the zfish library
 
 /// Temporarily set an environment variable for the duration of a function
 pub fn with_env_var<F, T>(name: &str, value: Option<&str>, f: F) -> T

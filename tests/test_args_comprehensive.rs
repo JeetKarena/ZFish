@@ -1,7 +1,7 @@
 //! Comprehensive tests for argument parsing
 //! Tests edge cases, empty inputs, Unicode, special characters, etc.
 
-use kite_cli::Args;
+use zfish::Args;
 
 #[test]
 fn test_empty_args() {

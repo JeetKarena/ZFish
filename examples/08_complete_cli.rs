@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Jeet Karena <karenajeet@proton.me>
 // Example: Complete CLI - Putting it all together
 
-use kite_cli::{Args, Color, Level, Logger, ProgressBar, Style};
+use zfish::{Args, Color, Level, Logger, ProgressBar, Style};
 use std::thread;
 use std::time::Duration;
 
@@ -27,7 +27,7 @@ fn main() {
         println!(
             "{}",
             Color::Cyan
-                .paint("Kite Example CLI v0.1.0")
+                .paint("zfish Example CLI v0.1.0")
                 .style(Style::Bold)
         );
         return;
@@ -93,7 +93,7 @@ fn main() {
 fn show_help() {
     println!(
         "{}",
-        Color::Cyan.paint("Kite Example CLI").style(Style::Bold)
+        Color::Cyan.paint("zfish Example CLI").style(Style::Bold)
     );
     println!();
     println!("USAGE:");

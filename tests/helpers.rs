@@ -1,4 +1,4 @@
-/* //! Helper functions for testing the Kite library
+/* //! Helper functions for testing the zfish library
 
 use std::io::{self, Read, Write};
 use std::env;
@@ -37,7 +37,7 @@ where
     Ok("Output captured (placeholder)".to_string())
 }
 
-use kite_cli::style::{Color, Style};
+use zfish::style::{Color, Style};
 
 #[test]
 fn test_basic_coloring() {

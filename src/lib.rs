@@ -1,13 +1,13 @@
-//! # Kite — Ultra-Light Zero-Dependency CLI Framework
+//! # zfish — Ultra-Light Zero-Dependency CLI Framework
 //!
 //! ```text
 //! ╭─╮
-//! │ ╰─╮  Kite — Soar above the complexity
+//! │ ╰─╮  zfish — Soar above the complexity
 //! ╰─╯
 //! ```
 //!
-//! **Kite** is a zero-dependency Rust library for building beautiful, fast, and reliable
-//! command-line applications. Built with only Rust's standard library, Kite provides
+//! **zfish** is a zero-dependency Rust library for building beautiful, fast, and reliable
+//! command-line applications. Built with only Rust's standard library, zfish provides
 //! everything you need for modern CLI development without the bloat.
 //!
 //! ## Philosophy
@@ -29,7 +29,7 @@
 //! ## Quick Start
 //!
 //! ```rust
-//! use kite_cli::{Args, Color};
+//! use zfish::{Args, Color};
 //!
 //! let args = Args::parse();
 //! if args.has_flag("verbose") {
@@ -60,7 +60,7 @@
 //!
 //! ```text
 //! ╔═══════════════════════════════════════════════════════════════╗
-//! ║  Kite v0.1.0                                                  ║
+//! ║  zfish v0.1.0                                                  ║
 //! ║  Copyright © 2025 Jeet Karena                                 ║
 //! ║  Licensed under MIT OR Apache-2.0                             ║
 //! ╚═══════════════════════════════════════════════════════════════╝
@@ -68,7 +68,7 @@
 
 #![deny(unsafe_code)] // Deny unsafe code by default (can be overridden in os module)
 #![warn(missing_docs, missing_debug_implementations, rust_2018_idioms)]
-#![doc(html_root_url = "https://docs.rs/kite/0.1.0")]
+#![doc(html_root_url = "https://docs.rs/zfish/0.1.0")]
 
 //! Core modules
 
@@ -85,7 +85,7 @@ pub(crate) mod os;
 // Re-export main components for easier access
 pub use args::Args;
 pub use log::{Level, Logger};
-pub use progress::ProgressBar;
+pub use progress::{ProgressBar, ProgressStyle};
 pub use prompt::Prompt;
 pub use style::{Color, Style};
 pub use term::Terminal;
@@ -96,8 +96,8 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 /// ASCII art logo
 pub const LOGO: &str = r#"
 ╭─╮
-│ ╰─╮  Kite — Ultra-light CLI framework
-╰─╯
+│ ╰─╮  zfish — Ultra-light CLI framework
+╰─╯";
 "#;
 
 #[cfg(test)]
@@ -111,8 +111,7 @@ mod tests {
     }
 
     #[test]
-    fn logo_renders() {
-        assert!(LOGO.contains("Kite"));
-        assert!(LOGO.len() > 10);
+    fn test_logo() {
+        assert!(LOGO.contains("zfish"));
     }
 }

@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Jeet Karena <karenajeet@proton.me>
 // Example: Interactive Prompts - User input
 
-use kite_cli::{Color, Prompt, Style};
+use zfish::{Color, Prompt, Style};
 
 fn main() {
     println!(

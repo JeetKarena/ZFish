@@ -2,7 +2,7 @@
 //!
 //! ```text
 //! ╔═══════════════════════════════════════════════════════════════╗
-//! ║  Kite — os/unix.rs                                            ║
+//! ║  zfish — os/unix.rs                                            ║
 //! ║  Unix/Linux-specific platform code (unsafe allowed here)      ║
 //! ║  Copyright © 2025 Jeet Karena <karenajeet@proton.me>        ║
 //! ║  Licensed under MIT OR Apache-2.0                             ║
@@ -103,5 +103,40 @@ pub fn read_password() -> io::Result<String> {
         }
 
         Ok(password)
+    }
+}
+
+/// Get terminal size on Unix/Linux using ioctl
+pub fn get_terminal_size() -> Option<(u16, u16)> {
+    #[repr(C)]
+    struct Winsize {
+        ws_row: u16,
+        ws_col: u16,
+        ws_xpixel: u16,
+        ws_ypixel: u16,
+    }
+
+    const TIOCGWINSZ: u64 = 0x5413;
+
+    unsafe extern "C" {
+        fn ioctl(fd: i32, request: u64, argp: *mut Winsize) -> i32;
+    }
+
+    // SAFETY: ioctl is called with a valid file descriptor (stdout),
+    // a proper request code for getting window size, and a properly
+    // allocated Winsize struct. The FFI call is checked for errors.
+    unsafe {
+        let mut ws: Winsize = std::mem::zeroed();
+        let stdout_fd = io::stdout().as_raw_fd();
+
+        if ioctl(stdout_fd, TIOCGWINSZ, &mut ws) == 0 {
+            // Success - return (width, height)
+            if ws.ws_col > 0 && ws.ws_row > 0 {
+                return Some((ws.ws_col, ws.ws_row));
+            }
+        }
+
+        // Fall back to default if ioctl fails
+        None
     }
 }

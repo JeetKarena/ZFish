@@ -2,7 +2,7 @@
 //!
 //! ```text
 //! ╔═══════════════════════════════════════════════════════════════╗
-//! ║  Kite — prompt.rs                                             ║
+//! ║  zfish — prompt.rs                                             ║
 //! ║  Interactive user input without dependencies                  ║
 //! ║  Copyright © 2025 Jeet Karena <karenajeet@proton.me>        ║
 //! ║  Licensed under MIT OR Apache-2.0                             ║

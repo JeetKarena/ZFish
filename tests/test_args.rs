@@ -1,4 +1,4 @@
-use kite_cli::Args;
+use zfish::Args;
 
 #[test]
 fn test_args_parsing() {

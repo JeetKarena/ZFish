@@ -1,12 +1,16 @@
 // Copyright (c) 2025 Jeet Karena <karenajeet@proton.me>
 // Example 1: Hello World - The simplest Kite program
 
-use kite_cli::style::Color;
+use zfish::style::Color;
+
+    // Simple colored output
+    // Copyright (c) 2025 Jeet Karena <karenajeet@proton.me>
+// Example 1: Hello World - The simplest zfish program
+
 
 fn main() {
-    // Simple colored output
-    println!("{}", Color::Green.paint("Hello, Kite! 🪁"));
-
+    println!("{}", Color::Green.paint("Hello, zfish! 🐟"));
+    
     // Multiple colors
     println!(
         "{} {} {}",
@@ -20,4 +24,5 @@ fn main() {
 
     // Custom 256 colors
     println!("{}", Color::Custom(208).paint("Orange (256-color palette)"));
+    
 }

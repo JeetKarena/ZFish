@@ -2,7 +2,7 @@
 //!
 //! ```text
 //! ╔═══════════════════════════════════════════════════════════════╗
-//! ║  Kite — os/mod.rs                                             ║
+//! ║  zfish — os/mod.rs                                             ║
 //! ║  Platform-specific code isolation                             ║
 //! ║  Copyright © 2025 Jeet Karena <karenajeet@proton.me>        ║
 //! ║  Licensed under MIT OR Apache-2.0                             ║
@@ -43,5 +43,24 @@ pub fn read_password() -> std::io::Result<String> {
         io::stdin().read_line(&mut password)?;
         password.pop(); // Remove newline
         Ok(password)
+    }
+}
+
+/// Get terminal size (width, height) - platform-specific implementation
+pub fn get_terminal_size() -> Option<(u16, u16)> {
+    #[cfg(windows)]
+    {
+        windows::get_terminal_size()
+    }
+
+    #[cfg(unix)]
+    {
+        unix::get_terminal_size()
+    }
+
+    #[cfg(not(any(windows, unix)))]
+    {
+        // Fallback for other platforms
+        Some((80, 24))
     }
 }

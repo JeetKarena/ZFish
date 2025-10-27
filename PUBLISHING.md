@@ -1,4 +1,4 @@
-# 🚀 Publishing Kite to Crates.io - Step-by-Step Guide
+# 🚀 Publishing zfish to Crates.io - Step-by-Step Guide
 
 ## ✅ Pre-Publication Checklist
 
@@ -45,7 +45,7 @@ git push origin main
 
 ### Step 3: Set Up GitHub Secrets
 
-1. Go to your GitHub repository: https://github.com/jeetkarena/kite
+1. Go to your GitHub repository: https://github.com/JeetKarena/ZFish
 2. Click "Settings" → "Secrets and variables" → "Actions"
 3. Click "New repository secret"
 4. Name: `CARGO_TOKEN`
@@ -54,7 +54,7 @@ git push origin main
 
 ### Step 4: Wait for CI to Pass
 
-1. Go to https://github.com/jeetkarena/kite/actions
+1. Go to https://github.com/JeetKarena/ZFish/actions
 2. Wait for all CI checks to pass (tests, clippy, fmt, docs)
 3. If any fail, fix the issues and push again
 
@@ -68,7 +68,7 @@ cargo package --list
 cargo publish --dry-run
 
 # If successful, you'll see:
-# "uploading kite v0.1.0"
+# "uploading zfish v0.1.0"
 # "warning: aborting upload due to dry run"
 ```
 
@@ -102,9 +102,9 @@ cargo publish
 
 ### Step 8: Verify Publication
 
-1. Check crates.io: https://crates.io/crates/kite
-2. Check docs.rs: https://docs.rs/kite (builds automatically)
-3. Test installation: `cargo install kite`
+1. Check crates.io: https://crates.io/crates/zfish
+2. Check docs.rs: https://docs.rs/zfish (builds automatically)
+3. Test installation: `cargo install zfish`
 
 ## 🔄 Future Releases
 
@@ -129,8 +129,8 @@ The release workflow includes:
 ## 📊 Post-Publication
 
 After publishing:
-1. Monitor https://docs.rs/kite for documentation build
-2. Check https://lib.rs/crates/kite for listing
+1. Monitor https://docs.rs/zfish for documentation build
+2. Check https://lib.rs/crates/zfish for listing
 3. Add badges to README (already included)
 4. Share on:
    - https://reddit.com/r/rust

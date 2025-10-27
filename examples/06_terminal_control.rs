@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Jeet Karena <karenajeet@proton.me>
 // Example: Terminal Control - Cursor and screen manipulation
 
-use kite_cli::term::Terminal;
+use zfish::term::Terminal;
 use std::thread;
 use std::time::Duration;
 
@@ -33,7 +33,7 @@ fn main() {
     let _ = Terminal::clear_screen();
 
     let _ = Terminal::print_at(2, 5, "┌─────────────────┐");
-    let _ = Terminal::print_at(3, 5, "│   Kite Demo     │");
+    let _ = Terminal::print_at(3, 5, "│   zfish Demo     │");
     let _ = Terminal::print_at(4, 5, "│                 │");
     let _ = Terminal::print_at(5, 5, "│   Hello World!  │");
     let _ = Terminal::print_at(6, 5, "└─────────────────┘");

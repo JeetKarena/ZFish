@@ -1,4 +1,4 @@
-use kite_cli::term::Terminal;
+use zfish::term::Terminal;
 
 #[test]
 fn test_terminal_size() {

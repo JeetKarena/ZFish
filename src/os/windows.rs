@@ -2,8 +2,8 @@
 //!
 //! ```text
 //! ╔═══════════════════════════════════════════════════════════════╗
-//! ║  Kite — os/windows.rs                                         ║
-//! ║  Windows-specific platform code (unsafe allowed here)         ║
+//! ║  zfish — os/windows.rs                                         ║
+//! ║  Windows-specific implementations                             ║
 //! ║  Copyright © 2025 Jeet Karena <karenajeet@proton.me>        ║
 //! ║  Licensed under MIT OR Apache-2.0                             ║
 //! ╚═══════════════════════════════════════════════════════════════╝
@@ -105,5 +105,64 @@ pub fn read_password() -> io::Result<String> {
         }
 
         Ok(password)
+    }
+}
+
+/// Get terminal size on Windows
+pub fn get_terminal_size() -> Option<(u16, u16)> {
+    // Windows API constants
+    const STD_OUTPUT_HANDLE: u32 = 0xFFFFFFF5;
+
+    #[repr(C)]
+    struct COORD {
+        x: i16,
+        y: i16,
+    }
+
+    #[repr(C)]
+    struct SMALL_RECT {
+        left: i16,
+        top: i16,
+        right: i16,
+        bottom: i16,
+    }
+
+    #[repr(C)]
+    struct CONSOLE_SCREEN_BUFFER_INFO {
+        dw_size: COORD,
+        dw_cursor_position: COORD,
+        w_attributes: u16,
+        sr_window: SMALL_RECT,
+        dw_maximum_window_size: COORD,
+    }
+
+    // FFI signatures for Windows Console functions
+    #[link(name = "kernel32")]
+    unsafe extern "system" {
+        fn GetStdHandle(nStdHandle: u32) -> *mut core::ffi::c_void;
+        fn GetConsoleScreenBufferInfo(
+            hConsoleOutput: *mut core::ffi::c_void,
+            lpConsoleScreenBufferInfo: *mut CONSOLE_SCREEN_BUFFER_INFO,
+        ) -> i32;
+    }
+
+    // SAFETY: Windows API calls are properly checked for errors.
+    // The console handle is valid for the process lifetime.
+    unsafe {
+        let handle = GetStdHandle(STD_OUTPUT_HANDLE);
+        if handle.is_null() {
+            return None;
+        }
+
+        let mut info: CONSOLE_SCREEN_BUFFER_INFO = std::mem::zeroed();
+        if GetConsoleScreenBufferInfo(handle, &mut info) == 0 {
+            return None;
+        }
+
+        // Calculate width and height from the window rectangle
+        let width = (info.sr_window.right - info.sr_window.left + 1) as u16;
+        let height = (info.sr_window.bottom - info.sr_window.top + 1) as u16;
+
+        Some((width, height))
     }
 }

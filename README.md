@@ -1,7 +1,7 @@
-# 🪁 Kite — Ultra-Light CLI Framework for Rust
+# 🐟 zfish — Ultra-Light CLI Framework for Rust
 
 <p align="center">
-  <img src="Logo.svg" alt="Kite Logo" width="200"/>
+  <img src="Logo.svg" alt="zfish Logo" width="200"/>
 </p>
 
 <p align="center">
@@ -9,11 +9,11 @@
 </p>
 
 <p align="center">
-  <a href="https://crates.io/crates/kite-cli"><img src="https://img.shields.io/crates/v/kite-cli.svg" alt="Crates.io"/></a>
-  <a href="https://docs.rs/kite-cli"><img src="https://docs.rs/kite-cli/badge.svg" alt="Documentation"/></a>
-  <a href="https://github.com/jeetkarena/kite#license"><img src="https://img.shields.io/crates/l/kite-cli.svg" alt="License"/></a>
+  <a href="https://crates.io/crates/zfish"><img src="https://img.shields.io/crates/v/zfish.svg" alt="Crates.io"/></a>
+  <a href="https://docs.rs/zfish"><img src="https://docs.rs/zfish/badge.svg" alt="Documentation"/></a>
+  <a href="https://github.com/JeetKarena/ZFish#license"><img src="https://img.shields.io/crates/l/zfish.svg" alt="License"/></a>
   <a href="https://blog.rust-lang.org/2023/06/01/Rust-1.70.0.html"><img src="https://img.shields.io/badge/MSRV-1.90-blue.svg" alt="MSRV"/></a>
-  <a href="https://github.com/jeetkarena/kite/actions"><img src="https://github.com/jeetkarena/kite/workflows/CI/badge.svg" alt="CI Status"/></a>
+  <a href="https://github.com/JeetKarena/ZFish/actions"><img src="https://github.com/JeetKarena/ZFish/workflows/CI/badge.svg" alt="CI Status"/></a>
 </p>
 
 ---
@@ -32,17 +32,17 @@
 
 ## 🚀 Quick Start
 
-Add Kite to your `Cargo.toml`:
+Add zfish to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-kite-cli = "0.1"
+zfish = "0.1"
 ```
 
 ### Hello, Colorful World!
 
 ```rust
-use kite_cli::Color;
+use zfish::Color;
 
 fn main() {
     println!("{}", Color::Green.paint("✓ Success!"));
@@ -54,7 +54,7 @@ fn main() {
 ### Argument Parsing
 
 ```rust
-use kite_cli::Args;
+use zfish::Args;
 
 fn main() {
     let args = Args::parse();
@@ -76,7 +76,7 @@ fn main() {
 ### Progress Bar
 
 ```rust
-use kite_cli::ProgressBar;
+use zfish::ProgressBar;
 use std::thread;
 use std::time::Duration;
 
@@ -95,7 +95,7 @@ fn main() {
 ### Interactive Prompts
 
 ```rust
-use kite_cli::Prompt;
+use zfish::Prompt;
 
 fn main() {
     let name = Prompt::text("What's your name?");
@@ -113,7 +113,7 @@ fn main() {
 ### 256-Color Palette
 
 ```rust
-use kite_cli::Color;
+use zfish::Color;
 
 fn main() {
     // Use any color from 0-255
@@ -135,7 +135,7 @@ fn main() {
 
 ## 📚 Documentation
 
-- **API Docs**: [docs.rs/kite](https://docs.rs/kite)
+- **API Docs**: [docs.rs/zfish](https://docs.rs/zfish)
 - **Roadmap**: [ROADMAP.md](./ROADMAP.md)
 - **Examples**: [examples/](./examples/) (coming soon)
 
@@ -143,7 +143,7 @@ fn main() {
 
 ## 🎯 Design Philosophy
 
-### Why Kite?
+### Why zfish?
 
 Most CLI frameworks pull in dozens of dependencies, increasing:
 - **Compile times** (minutes instead of seconds)
@@ -151,11 +151,11 @@ Most CLI frameworks pull in dozens of dependencies, increasing:
 - **Supply chain risk** (trust dozens of crates)
 - **Maintenance burden** (breaking changes cascade)
 
-Kite takes a different approach:
+zfish takes a different approach:
 
 ```text
 ┌─────────────────────────────────────────────────────┐
-│  Other CLI Frameworks       │  Kite                 │
+│  Other CLI Frameworks       │  zfish                 │
 ├─────────────────────────────────────────────────────┤
 │  50+ dependencies           │  0 dependencies       │
 │  ~10 second compile         │  ~1 second compile    │
@@ -201,10 +201,10 @@ See [ROADMAP.md](./ROADMAP.md) for detailed version plans.
 
 ## 🔧 Feature Flags
 
-Kite uses Cargo feature flags for optional functionality:
+zfish uses Cargo feature flags for optional functionality:
 
 ```toml
-[dependencies.kite]
+[dependencies.zfish]
 version = "0.1"
 default-features = false  # Disable all defaults
 features = ["colour"]     # Enable only what you need
@@ -232,8 +232,8 @@ Contributions are welcome! Here's how you can help:
 
 ```bash
 # Clone the repository
-git clone https://github.com/jeetkarena/kite.git
-cd kite
+git clone https://github.com/JeetKarena/ZFish.git
+cd zfish
 
 # Run tests
 cargo test
@@ -252,7 +252,7 @@ cargo run --example basic_colors
 
 ## 📊 Performance
 
-Kite is designed for speed:
+zfish is designed for speed:
 
 | Operation | Time (Ryzen 3600) |
 |-----------|-------------------|
@@ -287,7 +287,7 @@ Dual-licensed under your choice of:
 - **MIT License** ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
 - **Apache License 2.0** ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
 
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in Kite shall be dual-licensed as above, without any additional terms or conditions.
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in zfish shall be dual-licensed as above, without any additional terms or conditions.
 
 ---
 
@@ -313,7 +313,7 @@ Built with zero dependencies as a proof-of-concept that powerful CLIs don't need
 
 ## 📈 Stargazers over time
 
-[![Stargazers over time](https://starchart.cc/jeetkarena/kite.svg)](https://starchart.cc/jeetkarena/kite)
+[![Stargazers over time](https://starchart.cc/JeetKarena/ZFish.svg)](https://starchart.cc/JeetKarena/ZFish)
 
 ---
 
@@ -323,12 +323,12 @@ Built with zero dependencies as a proof-of-concept that powerful CLIs don't need
 
 ```text
 ╔═══════════════════════════════════════════════════════════════╗
-║  Kite v0.1.0                                                  ║
+║  zfish v0.1.0                                                  ║
 ║  Copyright © 2025 Jeet Karena                                 ║
 ║  Licensed under MIT OR Apache-2.0                             ║
 ╚═══════════════════════════════════════════════════════════════╝
 ```
 
-[⬆ Back to Top](#-kite--ultra-light-cli-framework-for-rust)
+[⬆ Back to Top](#-zfish--ultra-light-cli-framework-for-rust)
 
 </div>

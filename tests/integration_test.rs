@@ -1,4 +1,4 @@
-use kite_cli::{
+use zfish::{
     log::Logger,
     progress::ProgressBar,
     // Remove unused import: args::Args

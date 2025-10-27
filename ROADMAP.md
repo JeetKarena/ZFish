@@ -1,4 +1,4 @@
-# 🪁 Kite Development Roadmap
+# 🪁 zfish Development Roadmap
 
 > **Ultra-Light, Zero-Dependency CLI Framework for Rust**
 
@@ -271,7 +271,7 @@ Dual-licensed under **MIT OR Apache-2.0** (your choice).
 
 ```text
 ╔═══════════════════════════════════════════════════════════════╗
-║  Kite — Zero-Dependency CLI Framework                         ║
+║  zfish — Zero-Dependency CLI Framework                         ║
 ║  Copyright © 2025 Jeet Karena                                 ║
 ╚═══════════════════════════════════════════════════════════════╝
 ```

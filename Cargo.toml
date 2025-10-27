@@ -1,11 +1,11 @@
 [package]
-name = "kite-cli"
+name = "zfish"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.90"
 authors = ["Jeet Karena <karenajeet@proton.me>"]
 description = "Ultra-light, zero-dependency Rust CLI framework for building beautiful command-line applications"
-repository = "https://github.com/jeetkarena/kite"
+repository = "https://github.com/JeetKarena/ZFish.git"
 license = "MIT"
 readme = "README.md"
 keywords = ["cli", "terminal", "command-line", "argument-parser", "ansi"]
@@ -20,7 +20,7 @@ interactive = ["raw"] # Interactive prompts need raw mode
 
 [dependencies]
 # Intentionally empty — zero third-party dependencies
-# This is a core feature of Kite: build powerful CLIs using only std library
+# This is a core feature of zfish: build powerful CLIs using only std library
 
 [dev-dependencies]
 # Even in tests, we maintain zero dependencies

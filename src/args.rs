@@ -2,7 +2,7 @@
 //!
 //! ```text
 //! ╔═══════════════════════════════════════════════════════════════╗
-//! ║  Kite — args.rs                                               ║
+//! ║  zfish — args.rs                                               ║
 //! ║  Handcrafted argument parser with zero dependencies           ║
 //! ║  Copyright © 2025 Jeet Karena <karenajeet@proton.me>        ║
 //! ║  Licensed under MIT OR Apache-2.0                             ║
@@ -18,7 +18,7 @@
 //! ## Examples
 //!
 //! ```
-//! use kite_cli::Args;
+//! use zfish::Args;
 //!
 //! let args = Args::parse();
 //!

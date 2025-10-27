@@ -2,7 +2,7 @@
 //!
 //! ```text
 //! ╔═══════════════════════════════════════════════════════════════╗
-//! ║  Kite — style.rs                                              ║
+//! ║  zfish — style.rs                                              ║
 //! ║  ANSI color and text styling without dependencies            ║
 //! ║  Copyright © 2025 Jeet Karena <karenajeet@proton.me>        ║
 //! ║  Licensed under MIT OR Apache-2.0                             ║
@@ -20,7 +20,7 @@
 //! ### Basic Colors
 //!
 //! ```
-//! use kite_cli::Color;
+//! use zfish::Color;
 //!
 //! // Standard colors
 //! println!("{}", Color::Red.paint("Error!"));
@@ -34,7 +34,7 @@
 //! ### 256-Color Palette
 //!
 //! ```
-//! use kite_cli::Color;
+//! use zfish::Color;
 //!
 //! // Custom 256 colors (0-255)
 //! println!("{}", Color::Custom(196).paint("Bright red"));
@@ -45,7 +45,7 @@
 //! ### Text Styling
 //!
 //! ```
-//! use kite_cli::{Color, Style};
+//! use zfish::{Color, Style};
 //!
 //! // Combine colors and styles
 //! let text = Color::Red.paint("Error").style(Style::Bold);

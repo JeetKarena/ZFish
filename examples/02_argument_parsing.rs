@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Jeet Karena <karenajeet@proton.me>
 // Example 2: Argument Parsing - Parse CLI arguments without dependencies
 
-use kite_cli::Args;
+use zfish::Args;
 
 fn main() {
     // Parse command-line arguments

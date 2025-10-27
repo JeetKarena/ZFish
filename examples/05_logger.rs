@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Jeet Karena <karenajeet@proton.me>
 // Example: Logger - Leveled logging
 
-use kite_cli::log::{Level, Logger};
+use zfish::log::{Level, Logger};
 
 fn main() {
     println!("Example 1: Default logger (Info level)");

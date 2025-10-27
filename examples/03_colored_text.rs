@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Jeet Karena <karenajeet@proton.me>
 // Example: Colored Text - Advanced styling
 
-use kite_cli::{Color, Style};
+use zfish::{Color, Style};
 
 fn main() {
     println!("=== Basic Colors ===");

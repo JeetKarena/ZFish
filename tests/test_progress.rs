@@ -1,4 +1,4 @@
-use kite_cli::progress::ProgressBar;
+use zfish::progress::ProgressBar;
 
 #[test]
 fn test_progress_bar_creation() {

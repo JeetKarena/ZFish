@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "kite-cli"
+name = "zfish"
 version = "0.1.0"
