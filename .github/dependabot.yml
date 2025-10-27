@@ -1,0 +1,40 @@
+# Dependabot configuration for ZFish
+# 
+# Note: ZFish maintains zero runtime dependencies as a core principle.
+# This config only monitors GitHub Actions to keep CI/CD workflows secure and up-to-date.
+
+version: 2
+updates:
+  # Monitor GitHub Actions for security updates
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    open-pull-requests-limit: 5
+
+  # Monitor Cargo dependencies (currently none, but ready for dev-dependencies)
+  # ZFish maintains zero runtime dependencies - this only catches dev/build deps if added
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "rust"
+    open-pull-requests-limit: 5
+    # Ignore patch updates for stability, only minor/major
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
