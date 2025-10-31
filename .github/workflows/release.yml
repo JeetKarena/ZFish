@@ -1,5 +1,14 @@
 name: Release
 
+# This workflow only runs when you manually create and push a version tag
+# To create a release:
+# 1. Update version in Cargo.toml
+# 2. Update CHANGELOG.md
+# 3. Commit changes: git commit -am "chore: release v0.x.x"
+# 4. Create tag: git tag v0.x.x
+# 5. Push tag: git push origin v0.x.x
+# This prevents accidental version bumps and maintains proper versioning control
+
 on:
   push:
     tags:
@@ -10,7 +19,6 @@ env:
 
 permissions:
   contents: write
-  packages: write
 
 jobs:
   publish:
@@ -73,25 +81,6 @@ jobs:
       - name: Skip publishing
         if: steps.check_published.outputs.published == 'true'
         run: echo "⏭️  Skipping publish - version already exists on crates.io"
-      
-      - name: Publish to GitHub Packages
-        if: steps.check_published.outputs.published == 'false'
-        run: |
-          echo "📦 Publishing zfish to GitHub Packages..."
-          
-          # Create .cargo/config.toml for GitHub Packages registry
-          mkdir -p .cargo
-          cat > .cargo/config.toml << EOF
-          [registries.github]
-          index = "sparse+https://ghcr.io/JeetKarena/zfish/"
-          
-          [net]
-          git-fetch-with-cli = true
-          EOF
-          
-          # Publish to GitHub Packages using GITHUB_TOKEN
-          cargo publish --registry github --token ${{ secrets.GITHUB_TOKEN }} || echo "⚠️  GitHub Packages publish failed (this is optional)"
-        continue-on-error: true
       
       - name: Create package artifact
         if: steps.check_published.outputs.published == 'false'

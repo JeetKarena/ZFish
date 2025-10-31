@@ -147,7 +147,7 @@ cargo run --example <example_name>
 
 ## 📝 Commit Message Guidelines
 
-We use **[Conventional Commits](https://www.conventionalcommits.org/)** for automatic semantic versioning.
+We use **[Conventional Commits](https://www.conventionalcommits.org/)** for clear, consistent commit history.
 
 ### Format
 
@@ -161,31 +161,31 @@ We use **[Conventional Commits](https://www.conventionalcommits.org/)** for auto
 
 ### Types
 
-| Type       | Version Bump | Description                             |
-| ---------- | ------------ | --------------------------------------- |
-| `feat:`    | MINOR        | A new feature                           |
-| `fix:`     | PATCH        | A bug fix                               |
-| `docs:`    | PATCH        | Documentation only changes              |
-| `style:`   | PATCH        | Code style changes (formatting, etc.)   |
-| `refactor:`| PATCH        | Code refactoring                        |
-| `perf:`    | PATCH        | Performance improvements                |
-| `test:`    | PATCH        | Adding or updating tests                |
-| `build:`   | PATCH        | Build system changes                    |
-| `ci:`      | PATCH        | CI configuration changes                |
-| `chore:`   | PATCH        | Other changes (dependencies, etc.)      |
-| `feat!:`   | MAJOR        | Breaking change (new feature)           |
-| `fix!:`    | MAJOR        | Breaking change (bug fix)               |
+| Type       | Semver Impact | Description                             |
+| ---------- | ------------- | --------------------------------------- |
+| `feat:`    | Minor         | A new feature                           |
+| `fix:`     | Patch         | A bug fix                               |
+| `docs:`    | None          | Documentation only changes              |
+| `style:`   | None          | Code style changes (formatting, etc.)   |
+| `refactor:`| None          | Code refactoring                        |
+| `perf:`    | Patch         | Performance improvements                |
+| `test:`    | None          | Adding or updating tests                |
+| `build:`   | None          | Build system changes                    |
+| `ci:`      | None          | CI configuration changes                |
+| `chore:`   | None          | Other changes (dependencies, etc.)      |
+| `feat!:`   | Major         | Breaking change (new feature)           |
+| `fix!:`    | Major         | Breaking change (bug fix)               |
 
 ### Examples
 
 ```bash
-# New feature (bumps 0.1.0 → 0.2.0)
+# New feature (minor version impact)
 feat: add table rendering support
 
-# Bug fix (bumps 0.1.0 → 0.1.1)
+# Bug fix (patch version impact)
 fix: correct terminal size detection on Windows
 
-# Breaking change (bumps 0.1.0 → 1.0.0)
+# Breaking change (major version impact)
 feat!: redesign Progress API to use builder pattern
 
 BREAKING CHANGE: Progress::new() now requires builder pattern.
@@ -205,7 +205,6 @@ feat: add spinner animation styles
 ### Special Markers
 
 - **`[skip ci]`** - Skip CI pipeline
-- **`[no release]`** - Don't trigger automatic release
 
 ```bash
 git commit -m "docs: fix typo in readme [skip ci]"
@@ -426,28 +425,34 @@ When updating documentation:
 
 ## 🚀 Release Process
 
-### Automatic Releases
+### Manual Releases Only
 
-ZFish uses **automatic semantic versioning**. When you push to `main`, the system automatically:
+ZFish uses **manual, intentional releases** to maintain proper semantic versioning and quality control.
 
-1. Analyzes your commit message
-2. Determines version bump (major/minor/patch)
-3. Updates `Cargo.toml`
-4. Creates a git tag
-5. Publishes to crates.io
-6. Creates GitHub release
+**Contributors**: You don't need to worry about versioning. Just focus on your changes and use conventional commit messages.
 
-See [`.github/RELEASE_GUIDE.md`](.github/RELEASE_GUIDE.md) for details.
+**Maintainers**: See [`.github/RELEASE_PROCESS.md`](.github/RELEASE_PROCESS.md) for the complete release workflow.
 
-### Version Bumping
+### How It Works
 
-Based on your commit type:
+1. Contributors submit PRs with their changes
+2. Maintainers review and merge to `main`
+3. When ready for release, maintainers:
+   - Update version in `Cargo.toml` following semver
+   - Update `CHANGELOG.md` with changes
+   - Create and push a version tag (e.g., `v0.2.0`)
+4. GitHub Actions automatically:
+   - Runs all tests and checks
+   - Publishes to crates.io
+   - Creates GitHub release with artifacts
 
-- `feat:` → Minor version (0.1.0 → 0.2.0)
-- `fix:` → Patch version (0.1.0 → 0.1.1)
-- `feat!:` → Major version (0.1.0 → 1.0.0)
+### Semantic Versioning
 
-**You don't need to manually update versions!** Just use proper commit messages.
+We follow [Semantic Versioning](https://semver.org/):
+
+- **MAJOR** (x.0.0): Breaking changes that require user code updates
+- **MINOR** (0.x.0): New features, backward compatible
+- **PATCH** (0.0.x): Bug fixes, backward compatible
 
 ---
 

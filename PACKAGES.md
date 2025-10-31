@@ -1,38 +1,40 @@
-# 📦 GitHub Packages
+# 📦 Installation Guide
 
-This document explains how to install and use `zfish` from GitHub Packages as an alternative to crates.io.
+This document explains different ways to install and use `zfish` in your Rust projects.
 
-## Why GitHub Packages?
+## Installation Methods
 
-GitHub Packages provides an alternative distribution channel for ZFish:
+ZFish is primarily distributed through crates.io, with GitHub Releases providing backup distribution:
 
-- **Direct from source**: Download `.crate` files directly from GitHub Releases
-- **Checksum verification**: SHA256 and SHA512 checksums for security
-- **Full control**: Not dependent on crates.io availability
-- **Enterprise-friendly**: Works with GitHub Enterprise and private repositories
+- **Stable releases**: Published on crates.io
+- **Direct downloads**: `.crate` files available from GitHub Releases
+- **Checksum verification**: SHA256 checksums for security
+- **Version control**: Semantic versioning following semver standards
 
 ## 📥 Installation Methods
 
 ### Method 1: From crates.io (Recommended)
 
-The easiest way to use ZFish:
+The standard and easiest way to use ZFish:
 
 ```toml
 [dependencies]
 zfish = "0.1"
 ```
 
+Or use cargo add:
+
 ```bash
 cargo add zfish
 ```
 
-### Method 2: From GitHub Releases
+### Method 2: From GitHub Releases (Backup)
 
 Download and install from GitHub Packages:
 
 ```bash
 # Set the version you want
-VERSION="0.1.8"
+VERSION="0.1.10"
 
 # Download the .crate file
 wget https://github.com/JeetKarena/ZFish/releases/download/v${VERSION}/zfish-${VERSION}.crate
@@ -62,7 +64,7 @@ Or a specific tag:
 
 ```toml
 [dependencies]
-zfish = { git = "https://github.com/JeetKarena/ZFish.git", tag = "v0.1.8" }
+zfish = { git = "https://github.com/JeetKarena/ZFish.git", tag = "v0.1.10" }
 ```
 
 ## 🔐 Security & Verification
@@ -73,12 +75,12 @@ Every GitHub release includes SHA256 and SHA512 checksums:
 
 ```bash
 # SHA256
-sha256sum zfish-0.1.8.crate
-# Should match: zfish-0.1.8.crate.sha256
+sha256sum zfish-0.1.10.crate
+# Should match: zfish-0.1.10.crate.sha256
 
 # SHA512
-sha512sum zfish-0.1.8.crate
-# Should match: zfish-0.1.8.crate.sha512
+sha512sum zfish-0.1.10.crate
+# Should match: zfish-0.1.10.crate.sha512
 ```
 
 ### GPG Signatures (Coming Soon)
@@ -110,7 +112,7 @@ GitHub Packages publishing is fully automated:
 ```yaml
 - name: Install zfish
   run: |
-    VERSION="0.1.8"
+    VERSION="0.1.10"
     wget https://github.com/JeetKarena/ZFish/releases/download/v${VERSION}/zfish-${VERSION}.crate
     tar -xzf zfish-${VERSION}.crate
 ```
@@ -120,7 +122,7 @@ GitHub Packages publishing is fully automated:
 ```yaml
 install_zfish:
   script:
-    - VERSION="0.1.8"
+    - VERSION="0.1.10"
     - wget https://github.com/JeetKarena/ZFish/releases/download/v${VERSION}/zfish-${VERSION}.crate
     - tar -xzf zfish-${VERSION}.crate
 ```
@@ -142,10 +144,15 @@ If you notice issues with GitHub Packages distribution, please [open an issue](h
 
 ## 📚 Additional Resources
 
-- [GitHub Packages Documentation](https://docs.github.com/en/packages)
-- [Cargo Documentation](https://doc.rust-lang.org/cargo/)
-- [ZFish Releases](https://github.com/JeetKarena/ZFish/releases)
+- **[Developer Documentation](https://zfish-devdocs.vercel.app)** — Interactive guides and examples
+- **[API Reference](https://docs.rs/zfish)** — Complete API documentation
+- **[GitHub Packages Documentation](https://docs.github.com/en/packages)** — Official GitHub guide
+- **[Cargo Documentation](https://doc.rust-lang.org/cargo/)** — Rust package manager docs
+- **[ZFish Releases](https://github.com/JeetKarena/ZFish/releases)** — All versions and downloads
+- **[Roadmap](https://sprinkle-toque-13b.notion.site/ZFish-29d4eaaebc9d80bd82f3c27833a92232)** — Feature status and upcoming releases
 
 ---
 
 **Questions?** Open a [GitHub Discussion](https://github.com/JeetKarena/ZFish/discussions)
+
+**License:** [MIT License](https://github.com/JeetKarena/ZFish/blob/main/LICENSE)

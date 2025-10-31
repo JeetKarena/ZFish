@@ -46,13 +46,19 @@
 //!
 //! ## Project Status
 //!
-//! **Current Version**: 0.1.0 (Milestone 1 — Cross-Platform Terminal)
+//! **Current Version**: 0.1.10 (Active Development)
 //!
 //! See [ROADMAP.md](../ROADMAP.md) for future plans.
 //!
+//! ## Documentation
+//!
+//! - **[Developer Docs](https://zfish-devdocs.vercel.app)** — Interactive guides and tutorials
+//! - **[API Reference](https://docs.rs/zfish)** — Complete API documentation
+//! - **[Roadmap](https://sprinkle-toque-13b.notion.site/ZFish-29d4eaaebc9d80bd82f3c27833a92232)** — Feature status
+//!
 //! ## License
 //!
-//! Dual-licensed under MIT OR Apache-2.0 (your choice).
+//! Licensed under the [MIT License](https://opensource.org/licenses/MIT).
 //!
 //! ## Credits
 //!
@@ -60,9 +66,9 @@
 //!
 //! ```text
 //! ╔═══════════════════════════════════════════════════════════════╗
-//! ║  zfish v0.1.0                                                  ║
+//! ║  zfish v0.1.10                                                ║
 //! ║  Copyright © 2025 Jeet Karena                                 ║
-//! ║  Licensed under MIT OR Apache-2.0                             ║
+//! ║  Licensed under MIT License                                   ║
 //! ╚═══════════════════════════════════════════════════════════════╝
 //! ```
 
@@ -73,21 +79,26 @@
 //! Core modules
 
 pub mod args;
+pub mod command;
 pub mod log;
 pub mod progress;
 pub mod prompt;
 pub mod style;
+pub mod table;
 pub mod term;
+pub mod unicode;
 
 // Platform-specific code (unsafe allowed here)
 pub(crate) mod os;
 
 // Re-export main components for easier access
 pub use args::Args;
+pub use command::{App, Arg, ArgMatches, Command, CommandError, CommandResult};
 pub use log::{Level, Logger};
 pub use progress::{ProgressBar, ProgressStyle};
 pub use prompt::Prompt;
 pub use style::{Color, Style};
+pub use table::{Alignment, BoxStyle, Table, draw_box, draw_separator};
 pub use term::Terminal;
 
 /// Library version
