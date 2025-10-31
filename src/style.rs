@@ -208,7 +208,8 @@ impl StyledString {
 
     /// Detect if terminal supports colors
     fn supports_colors() -> bool {
-        // `NO_COLOR` environment variable should always disable colors.
+        // `NO_COLOR` environment variable should ALWAYS disable colors, even in tests
+        // This follows the NO_COLOR standard: https://no-color.org/
         if std::env::var("NO_COLOR").is_ok() {
             return false;
         }
@@ -220,7 +221,7 @@ impl StyledString {
         }
 
         // Standard detection for non-test environments.
-        std::env::var("COLORTERM").is_ok_and(|_| true)
+        std::env::var("COLORTERM").is_ok()
             || std::env::var("TERM").is_ok_and(|term| term != "dumb")
     }
 }
