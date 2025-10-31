@@ -48,10 +48,10 @@ fn char_width_at(chars: &[char], i: usize) -> (usize, usize) {
         return handle_wide_or_emoji(chars, i);
     }
 
-    if is_keycap_base(cp) {
-        if let Some(result) = handle_keycap_sequence(chars, i) {
-            return result;
-        }
+    if is_keycap_base(cp)
+        && let Some(result) = handle_keycap_sequence(chars, i)
+    {
+        return result;
     }
 
     // Regular character (1-cell) + combining marks
@@ -82,11 +82,11 @@ fn handle_regional_indicator(chars: &[char], i: usize) -> (usize, usize) {
 /// Handle emoji or East Asian wide characters with ZWJ sequences
 fn handle_wide_or_emoji(chars: &[char], i: usize) -> (usize, usize) {
     let mut consumed = 1;
-    
+
     // Consume trailing parts of the cluster
     while i + consumed < chars.len() {
         let next_cp = chars[i + consumed] as u32;
-        
+
         if next_cp == 0x200D {
             // ZWJ - consume it and the next char if available
             consumed += 1;
@@ -95,15 +95,15 @@ fn handle_wide_or_emoji(chars: &[char], i: usize) -> (usize, usize) {
             }
             continue;
         }
-        
+
         if is_zero_width(next_cp) || is_emoji_modifier(next_cp) {
             consumed += 1;
             continue;
         }
-        
+
         break;
     }
-    
+
     (2, consumed)
 }
 
@@ -122,7 +122,7 @@ fn handle_keycap_sequence(chars: &[char], i: usize) -> Option<(usize, usize)> {
 /// Handle regular character with combining marks
 fn handle_regular_char(chars: &[char], i: usize) -> (usize, usize) {
     let mut consumed = 1;
-    
+
     while i + consumed < chars.len() {
         let next_cp = chars[i + consumed] as u32;
         if is_combining_mark(next_cp) {
@@ -131,7 +131,7 @@ fn handle_regular_char(chars: &[char], i: usize) -> (usize, usize) {
             break;
         }
     }
-    
+
     (1, consumed)
 }
 

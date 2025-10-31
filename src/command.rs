@@ -573,7 +573,17 @@ impl Command {
     pub fn generate_help(&self) -> String {
         let mut help = String::new();
 
-        // Header
+        self.generate_header(&mut help);
+        self.generate_usage(&mut help);
+        self.generate_args_section(&mut help);
+        self.generate_options_section(&mut help);
+        self.generate_subcommands_section(&mut help);
+
+        help
+    }
+
+    /// Generate header section (about and version)
+    fn generate_header(&self, help: &mut String) {
         if let Some(ref about) = self.about {
             help.push_str(&format!("{}\n", about));
         }
@@ -581,29 +591,22 @@ impl Command {
         if let Some(ref version) = self.version {
             help.push_str(&format!("\nVersion: {}\n", version));
         }
+    }
 
-        // Usage
+    /// Generate usage line
+    fn generate_usage(&self, help: &mut String) {
         help.push_str(&format!("\nUSAGE:\n    {}", self.name));
 
-        // Add positional arguments to usage
         let mut positional_args: Vec<&Arg> =
             self.args.iter().filter(|a| a.index.is_some()).collect();
         positional_args.sort_by_key(|a| a.index.unwrap());
 
-        if !self.args.iter().any(|a| a.index.is_none()) {
-            // No flags, just positionals
-        } else {
+        if self.args.iter().any(|a| a.index.is_none()) {
             help.push_str(" [OPTIONS]");
         }
 
         for arg in &positional_args {
-            if arg.last {
-                help.push_str(&format!(" [{}]...", arg.name.to_uppercase()));
-            } else if arg.required {
-                help.push_str(&format!(" <{}>", arg.name.to_uppercase()));
-            } else {
-                help.push_str(&format!(" [{}]", arg.name.to_uppercase()));
-            }
+            self.append_positional_usage(arg, help);
         }
 
         if !self.subcommands.is_empty() {
@@ -611,98 +614,141 @@ impl Command {
         }
 
         help.push('\n');
+    }
 
-        // Positional Arguments
-        if !positional_args.is_empty() {
-            help.push_str("\nARGS:\n");
-            for arg in &positional_args {
-                let mut arg_line = format!("    <{}>", arg.name.to_uppercase());
+    /// Append single positional arg to usage line
+    fn append_positional_usage(&self, arg: &Arg, help: &mut String) {
+        if arg.last {
+            help.push_str(&format!(" [{}]...", arg.name.to_uppercase()));
+        } else if arg.required {
+            help.push_str(&format!(" <{}>", arg.name.to_uppercase()));
+        } else {
+            help.push_str(&format!(" [{}]", arg.name.to_uppercase()));
+        }
+    }
 
-                while arg_line.len() < 30 {
-                    arg_line.push(' ');
-                }
+    /// Generate ARGS section for positional arguments
+    fn generate_args_section(&self, help: &mut String) {
+        let mut positional_args: Vec<&Arg> =
+            self.args.iter().filter(|a| a.index.is_some()).collect();
+        positional_args.sort_by_key(|a| a.index.unwrap());
 
-                if let Some(ref help_text) = arg.help {
-                    arg_line.push_str(help_text);
-                }
-
-                if arg.required {
-                    arg_line.push_str(" [required]");
-                }
-
-                help.push_str(&format!("{}\n", arg_line));
-            }
+        if positional_args.is_empty() {
+            return;
         }
 
-        // Flag/Option Arguments
+        help.push_str("\nARGS:\n");
+        for arg in &positional_args {
+            self.format_arg_line(arg, help);
+        }
+    }
+
+    /// Format a single positional argument line
+    fn format_arg_line(&self, arg: &Arg, help: &mut String) {
+        let mut arg_line = format!("    <{}>", arg.name.to_uppercase());
+
+        while arg_line.len() < 30 {
+            arg_line.push(' ');
+        }
+
+        if let Some(ref help_text) = arg.help {
+            arg_line.push_str(help_text);
+        }
+
+        if arg.required {
+            arg_line.push_str(" [required]");
+        }
+
+        help.push_str(&format!("{}\n", arg_line));
+    }
+
+    /// Generate OPTIONS section for flags and options
+    fn generate_options_section(&self, help: &mut String) {
         let option_args: Vec<&Arg> = self.args.iter().filter(|a| a.index.is_none()).collect();
-        if !option_args.is_empty() {
-            help.push_str("\nOPTIONS:\n");
-            for arg in &option_args {
-                let mut arg_line = String::from("    ");
 
-                if let Some(short) = arg.short {
-                    arg_line.push_str(&format!("-{}", short));
-                    if arg.long.is_some() {
-                        arg_line.push_str(", ");
-                    }
-                }
+        if option_args.is_empty() {
+            return;
+        }
 
-                if let Some(ref long) = arg.long {
-                    arg_line.push_str(&format!("--{}", long));
-                }
+        help.push_str("\nOPTIONS:\n");
+        for arg in &option_args {
+            self.format_option_line(arg, help);
+        }
+    }
 
-                if arg.takes_value {
-                    arg_line.push_str(&format!(" <{}>", arg.name.to_uppercase()));
-                }
+    /// Format a single option/flag line
+    fn format_option_line(&self, arg: &Arg, help: &mut String) {
+        let mut arg_line = String::from("    ");
 
-                // Pad to align help text
-                while arg_line.len() < 30 {
-                    arg_line.push(' ');
-                }
-
-                if let Some(ref help_text) = arg.help {
-                    arg_line.push_str(help_text);
-                }
-
-                if arg.required {
-                    arg_line.push_str(" [required]");
-                }
-
-                if let Some(ref default) = arg.default_value {
-                    arg_line.push_str(&format!(" [default: {}]", default));
-                }
-
-                help.push_str(&format!("{}\n", arg_line));
+        if let Some(short) = arg.short {
+            arg_line.push_str(&format!("-{}", short));
+            if arg.long.is_some() {
+                arg_line.push_str(", ");
             }
         }
 
-        // Subcommands
-        if !self.subcommands.is_empty() {
-            help.push_str("\nCOMMANDS:\n");
-            for subcmd in &self.subcommands {
-                let mut cmd_line = format!("    {}", subcmd.name);
-
-                // Show aliases
-                if !subcmd.aliases.is_empty() {
-                    cmd_line.push_str(&format!(" ({})", subcmd.aliases.join(", ")));
-                }
-
-                while cmd_line.len() < 30 {
-                    cmd_line.push(' ');
-                }
-
-                if let Some(ref about) = subcmd.about {
-                    cmd_line.push_str(about);
-                }
-
-                help.push_str(&format!("{}\n", cmd_line));
-            }
-
-            help.push_str("\nRun '<COMMAND> --help' for more information on a specific command.\n");
+        if let Some(ref long) = arg.long {
+            arg_line.push_str(&format!("--{}", long));
         }
 
-        help
+        if arg.takes_value {
+            arg_line.push_str(&format!(" <{}>", arg.name.to_uppercase()));
+        }
+
+        while arg_line.len() < 30 {
+            arg_line.push(' ');
+        }
+
+        self.append_option_metadata(arg, &mut arg_line);
+        help.push_str(&format!("{}\n", arg_line));
+    }
+
+    /// Append help text, required flag, and default value to option line
+    fn append_option_metadata(&self, arg: &Arg, arg_line: &mut String) {
+        if let Some(ref help_text) = arg.help {
+            arg_line.push_str(help_text);
+        }
+
+        if arg.required {
+            arg_line.push_str(" [required]");
+        }
+
+        if let Some(ref default) = arg.default_value {
+            arg_line.push_str(&format!(" [default: {}]", default));
+        }
+    }
+
+    /// Generate COMMANDS section for subcommands
+    fn generate_subcommands_section(&self, help: &mut String) {
+        if self.subcommands.is_empty() {
+            return;
+        }
+
+        help.push_str("\nCOMMANDS:\n");
+        for subcmd in &self.subcommands {
+            self.format_subcommand_line(subcmd, help);
+        }
+
+        help.push_str("\nRun '<COMMAND> --help' for more information on a specific command.\n");
+    }
+
+    /// Format a single subcommand line
+    fn format_subcommand_line(&self, subcmd: &Command, help: &mut String) {
+        let mut cmd_line = format!("    {}", subcmd.name);
+
+        if !subcmd.aliases.is_empty() {
+            cmd_line.push_str(&format!(" ({})", subcmd.aliases.join(", ")));
+        }
+
+        while cmd_line.len() < 30 {
+            cmd_line.push(' ');
+        }
+
+        if let Some(ref about) = subcmd.about {
+            cmd_line.push_str(about);
+        }
+
+        help.push_str(&format!("{}\n", cmd_line));
     }
 
     /// Helper: Process a value with delimiter support
@@ -743,11 +789,11 @@ impl Command {
     fn parse_args(&self, args: &[String]) -> CommandResult<ArgMatches> {
         let mut matches = ArgMatches::new(&self.name);
         let mut positional_values: Vec<String> = Vec::new();
-        
+
         self.parse_command_line(args, &mut matches, &mut positional_values)?;
         self.process_positional_args(&positional_values, &mut matches);
         self.validate_matches(&mut matches)?;
-        
+
         Ok(matches)
     }
 
@@ -759,7 +805,7 @@ impl Command {
         positional_values: &mut Vec<String>,
     ) -> CommandResult<()> {
         let mut i = 0;
-        
+
         while i < args.len() {
             let arg = &args[i];
 
@@ -783,7 +829,7 @@ impl Command {
 
             i += self.parse_flag_or_option(arg, args, i, matches)?;
         }
-        
+
         Ok(())
     }
 
@@ -819,7 +865,11 @@ impl Command {
     }
 
     /// Parse long flag with = (--flag=value)
-    fn parse_long_flag_with_equals(&self, arg: &str, matches: &mut ArgMatches) -> CommandResult<()> {
+    fn parse_long_flag_with_equals(
+        &self,
+        arg: &str,
+        matches: &mut ArgMatches,
+    ) -> CommandResult<()> {
         let parts: Vec<&str> = arg.splitn(2, '=').collect();
         let flag_name = parts[0].trim_start_matches("--");
         let value = parts[1];
@@ -841,7 +891,8 @@ impl Command {
         matches: &mut ArgMatches,
     ) -> CommandResult<usize> {
         let flag_name = arg.trim_start_matches("--");
-        let found_arg = self.find_arg(flag_name)
+        let found_arg = self
+            .find_arg(flag_name)
             .ok_or_else(|| CommandError::UnknownArgument(flag_name.to_string()))?;
 
         if found_arg.takes_value {
@@ -872,7 +923,10 @@ impl Command {
         let mut consumed = 1;
 
         for (idx, c) in flags.chars().enumerate() {
-            let found_arg = self.args.iter().find(|a| a.matches_short(c))
+            let found_arg = self
+                .args
+                .iter()
+                .find(|a| a.matches_short(c))
                 .ok_or_else(|| CommandError::UnknownArgument(c.to_string()))?;
 
             if found_arg.takes_value && idx == flags.len() - 1 {
@@ -887,15 +941,14 @@ impl Command {
                 matches.insert(found_arg.name.clone(), ArgValue::Flag(true));
             }
         }
-        
+
         Ok(consumed)
     }
 
     /// Process positional arguments
     fn process_positional_args(&self, positional_values: &[String], matches: &mut ArgMatches) {
-        let mut positional_args: Vec<&Arg> = self.args.iter()
-            .filter(|a| a.index.is_some())
-            .collect();
+        let mut positional_args: Vec<&Arg> =
+            self.args.iter().filter(|a| a.index.is_some()).collect();
         positional_args.sort_by_key(|a| a.index.unwrap());
 
         for (idx, arg) in positional_args.iter().enumerate() {
@@ -905,7 +958,10 @@ impl Command {
                     matches.insert(arg.name.clone(), ArgValue::Multiple(remaining));
                 }
             } else if idx < positional_values.len() {
-                matches.insert(arg.name.clone(), ArgValue::Single(positional_values[idx].clone()));
+                matches.insert(
+                    arg.name.clone(),
+                    ArgValue::Single(positional_values[idx].clone()),
+                );
             }
         }
     }
@@ -934,11 +990,11 @@ impl Command {
     fn apply_defaults_and_env(&self, matches: &mut ArgMatches) -> CommandResult<()> {
         for arg in &self.args {
             if !matches.is_present(&arg.name) {
-                if let Some(ref env_var) = arg.env {
-                    if let Ok(value) = std::env::var(env_var) {
-                        matches.insert(arg.name.clone(), ArgValue::Single(value));
-                        continue;
-                    }
+                if let Some(ref env_var) = arg.env
+                    && let Ok(value) = std::env::var(env_var)
+                {
+                    matches.insert(arg.name.clone(), ArgValue::Single(value));
+                    continue;
                 }
                 if let Some(ref default) = arg.default_value {
                     matches.insert(arg.name.clone(), ArgValue::Single(default.clone()));

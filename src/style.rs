@@ -210,19 +210,19 @@ impl StyledString {
     fn supports_colors() -> bool {
         // `NO_COLOR` environment variable should ALWAYS disable colors, even in tests
         // This follows the NO_COLOR standard: https://no-color.org/
+        // Check this FIRST before any other logic
         if std::env::var("NO_COLOR").is_ok() {
             return false;
         }
 
-        // In a test environment, enable colors if `COLORTERM` is set,
-        // which indicates explicit support.
+        // In test environment, only enable colors if COLORTERM is explicitly set
+        // This ensures tests have predictable behavior
         if cfg!(test) {
             return std::env::var("COLORTERM").is_ok();
         }
 
-        // Standard detection for non-test environments.
-        std::env::var("COLORTERM").is_ok()
-            || std::env::var("TERM").is_ok_and(|term| term != "dumb")
+        // Standard detection for non-test environments
+        std::env::var("COLORTERM").is_ok() || std::env::var("TERM").is_ok_and(|term| term != "dumb")
     }
 }
 

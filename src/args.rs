@@ -80,7 +80,8 @@ impl Args {
         let mut i = 0;
         while i < args.len() {
             let arg = &args[i];
-            let consumed = Self::parse_argument(arg, &args, i, &mut flags, &mut options, &mut positional);
+            let consumed =
+                Self::parse_argument(arg, &args, i, &mut flags, &mut options, &mut positional);
             i += consumed;
         }
 
