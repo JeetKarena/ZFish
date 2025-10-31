@@ -742,150 +742,214 @@ impl Command {
     /// Parses command-line arguments
     fn parse_args(&self, args: &[String]) -> CommandResult<ArgMatches> {
         let mut matches = ArgMatches::new(&self.name);
-        let mut i = 0;
         let mut positional_values: Vec<String> = Vec::new();
+        
+        self.parse_command_line(args, &mut matches, &mut positional_values)?;
+        self.process_positional_args(&positional_values, &mut matches);
+        self.validate_matches(&mut matches)?;
+        
+        Ok(matches)
+    }
 
+    /// Parse command line arguments (flags, options, subcommands)
+    fn parse_command_line(
+        &self,
+        args: &[String],
+        matches: &mut ArgMatches,
+        positional_values: &mut Vec<String>,
+    ) -> CommandResult<()> {
+        let mut i = 0;
+        
         while i < args.len() {
             let arg = &args[i];
 
-            // Check for help flag
-            if arg == "--help" || arg == "-h" {
-                return Err(CommandError::HelpRequested);
-            }
-
-            // Check for version flag
-            if (arg == "--version" || arg == "-V") && self.version.is_some() {
-                return Err(CommandError::VersionRequested);
+            // Check for special flags
+            if self.handle_special_flags(arg)? {
+                return Ok(());
             }
 
             // Check for subcommand
-            if !arg.starts_with('-')
-                && let Some(subcmd) = self.find_subcommand(arg)
-            {
-                let sub_args = &args[i + 1..];
-                let sub_matches = subcmd.parse_args(sub_args)?;
-                matches.set_subcommand(arg.clone(), sub_matches);
-                break; // Stop parsing after subcommand
-            }
-
-            // Collect positional arguments (non-flag values)
             if !arg.starts_with('-') {
+                if let Some(subcmd) = self.find_subcommand(arg) {
+                    let sub_args = &args[i + 1..];
+                    let sub_matches = subcmd.parse_args(sub_args)?;
+                    matches.set_subcommand(arg.clone(), sub_matches);
+                    return Ok(());
+                }
                 positional_values.push(arg.clone());
                 i += 1;
                 continue;
             }
 
-            // Parse long flag with = (--flag=value)
-            if arg.starts_with("--") && arg.contains('=') {
-                let parts: Vec<&str> = arg.splitn(2, '=').collect();
-                let flag_name = parts[0].trim_start_matches("--");
-                let value = parts[1];
-
-                if let Some(found_arg) = self.find_arg(flag_name) {
-                    self.process_value(found_arg, value, &mut matches)?;
-                } else {
-                    return Err(CommandError::UnknownArgument(flag_name.to_string()));
-                }
-            }
-            // Parse long flag (--flag value or --flag)
-            else if arg.starts_with("--") {
-                let flag_name = arg.trim_start_matches("--");
-
-                if let Some(found_arg) = self.find_arg(flag_name) {
-                    if found_arg.takes_value {
-                        if i + 1 < args.len() && !args[i + 1].starts_with('-') {
-                            let value = &args[i + 1];
-                            self.process_value(found_arg, value, &mut matches)?;
-                            i += 1; // Skip next arg (the value)
-                        } else if let Some(ref default) = found_arg.default_value {
-                            matches
-                                .insert(found_arg.name.clone(), ArgValue::Single(default.clone()));
-                        }
-                    } else {
-                        matches.insert(found_arg.name.clone(), ArgValue::Flag(true));
-                    }
-                } else {
-                    return Err(CommandError::UnknownArgument(flag_name.to_string()));
-                }
-            }
-            // Parse short flag(s) (-v or -abc)
-            else if arg.starts_with('-') && arg.len() > 1 {
-                let flags = arg.trim_start_matches('-');
-
-                for (idx, c) in flags.chars().enumerate() {
-                    if let Some(found_arg) = self.args.iter().find(|a| a.matches_short(c)) {
-                        if found_arg.takes_value {
-                            // Last flag in group can take value from next arg
-                            if idx == flags.len() - 1
-                                && i + 1 < args.len()
-                                && !args[i + 1].starts_with('-')
-                            {
-                                let value = &args[i + 1];
-                                self.process_value(found_arg, value, &mut matches)?;
-                                i += 1; // Skip next arg
-                            } else if let Some(ref default) = found_arg.default_value {
-                                matches.insert(
-                                    found_arg.name.clone(),
-                                    ArgValue::Single(default.clone()),
-                                );
-                            }
-                        } else {
-                            matches.insert(found_arg.name.clone(), ArgValue::Flag(true));
-                        }
-                    } else {
-                        return Err(CommandError::UnknownArgument(c.to_string()));
-                    }
-                }
-            }
-
-            i += 1;
+            i += self.parse_flag_or_option(arg, args, i, matches)?;
         }
+        
+        Ok(())
+    }
 
-        // Process positional arguments
-        let mut positional_args: Vec<&Arg> =
-            self.args.iter().filter(|a| a.index.is_some()).collect();
+    /// Handle special flags like --help and --version
+    fn handle_special_flags(&self, arg: &str) -> CommandResult<bool> {
+        if arg == "--help" || arg == "-h" {
+            return Err(CommandError::HelpRequested);
+        }
+        if (arg == "--version" || arg == "-V") && self.version.is_some() {
+            return Err(CommandError::VersionRequested);
+        }
+        Ok(false)
+    }
+
+    /// Parse a single flag or option and return number of args consumed
+    fn parse_flag_or_option(
+        &self,
+        arg: &str,
+        args: &[String],
+        index: usize,
+        matches: &mut ArgMatches,
+    ) -> CommandResult<usize> {
+        if arg.starts_with("--") && arg.contains('=') {
+            self.parse_long_flag_with_equals(arg, matches)?;
+            Ok(1)
+        } else if arg.starts_with("--") {
+            self.parse_long_flag(arg, args, index, matches)
+        } else if arg.starts_with('-') && arg.len() > 1 {
+            self.parse_short_flags(arg, args, index, matches)
+        } else {
+            Ok(1)
+        }
+    }
+
+    /// Parse long flag with = (--flag=value)
+    fn parse_long_flag_with_equals(&self, arg: &str, matches: &mut ArgMatches) -> CommandResult<()> {
+        let parts: Vec<&str> = arg.splitn(2, '=').collect();
+        let flag_name = parts[0].trim_start_matches("--");
+        let value = parts[1];
+
+        if let Some(found_arg) = self.find_arg(flag_name) {
+            self.process_value(found_arg, value, matches)?;
+        } else {
+            return Err(CommandError::UnknownArgument(flag_name.to_string()));
+        }
+        Ok(())
+    }
+
+    /// Parse long flag (--flag value or --flag)
+    fn parse_long_flag(
+        &self,
+        arg: &str,
+        args: &[String],
+        index: usize,
+        matches: &mut ArgMatches,
+    ) -> CommandResult<usize> {
+        let flag_name = arg.trim_start_matches("--");
+        let found_arg = self.find_arg(flag_name)
+            .ok_or_else(|| CommandError::UnknownArgument(flag_name.to_string()))?;
+
+        if found_arg.takes_value {
+            if index + 1 < args.len() && !args[index + 1].starts_with('-') {
+                self.process_value(found_arg, &args[index + 1], matches)?;
+                Ok(2) // Consumed current + next
+            } else if let Some(ref default) = found_arg.default_value {
+                matches.insert(found_arg.name.clone(), ArgValue::Single(default.clone()));
+                Ok(1)
+            } else {
+                Ok(1)
+            }
+        } else {
+            matches.insert(found_arg.name.clone(), ArgValue::Flag(true));
+            Ok(1)
+        }
+    }
+
+    /// Parse short flag(s) (-v or -abc)
+    fn parse_short_flags(
+        &self,
+        arg: &str,
+        args: &[String],
+        index: usize,
+        matches: &mut ArgMatches,
+    ) -> CommandResult<usize> {
+        let flags = arg.trim_start_matches('-');
+        let mut consumed = 1;
+
+        for (idx, c) in flags.chars().enumerate() {
+            let found_arg = self.args.iter().find(|a| a.matches_short(c))
+                .ok_or_else(|| CommandError::UnknownArgument(c.to_string()))?;
+
+            if found_arg.takes_value && idx == flags.len() - 1 {
+                // Last flag can take value from next arg
+                if index + 1 < args.len() && !args[index + 1].starts_with('-') {
+                    self.process_value(found_arg, &args[index + 1], matches)?;
+                    consumed = 2;
+                } else if let Some(ref default) = found_arg.default_value {
+                    matches.insert(found_arg.name.clone(), ArgValue::Single(default.clone()));
+                }
+            } else {
+                matches.insert(found_arg.name.clone(), ArgValue::Flag(true));
+            }
+        }
+        
+        Ok(consumed)
+    }
+
+    /// Process positional arguments
+    fn process_positional_args(&self, positional_values: &[String], matches: &mut ArgMatches) {
+        let mut positional_args: Vec<&Arg> = self.args.iter()
+            .filter(|a| a.index.is_some())
+            .collect();
         positional_args.sort_by_key(|a| a.index.unwrap());
 
         for (idx, arg) in positional_args.iter().enumerate() {
             if arg.last {
-                // Variadic positional - collect all remaining
                 let remaining: Vec<String> = positional_values.iter().skip(idx).cloned().collect();
                 if !remaining.is_empty() {
                     matches.insert(arg.name.clone(), ArgValue::Multiple(remaining));
                 }
             } else if idx < positional_values.len() {
-                matches.insert(
-                    arg.name.clone(),
-                    ArgValue::Single(positional_values[idx].clone()),
-                );
+                matches.insert(arg.name.clone(), ArgValue::Single(positional_values[idx].clone()));
             }
         }
+    }
 
-        // Check for required arguments
+    /// Validate matches: check required args, apply defaults, check dependencies
+    fn validate_matches(&self, matches: &mut ArgMatches) -> CommandResult<()> {
+        self.check_required_args(matches)?;
+        self.apply_defaults_and_env(matches)?;
+        self.check_dependencies(matches)?;
+        self.check_conflicts(matches)?;
+        self.validate_groups(matches)?;
+        Ok(())
+    }
+
+    /// Check for required arguments
+    fn check_required_args(&self, matches: &ArgMatches) -> CommandResult<()> {
         for arg in &self.args {
             if arg.required && !matches.is_present(&arg.name) {
                 return Err(CommandError::MissingArgument(arg.name.clone()));
             }
         }
+        Ok(())
+    }
 
-        // Apply default values and environment variables
+    /// Apply default values and environment variables
+    fn apply_defaults_and_env(&self, matches: &mut ArgMatches) -> CommandResult<()> {
         for arg in &self.args {
             if !matches.is_present(&arg.name) {
-                // Try environment variable first
-                if let Some(ref env_var) = arg.env
-                    && let Ok(value) = std::env::var(env_var)
-                {
-                    matches.insert(arg.name.clone(), ArgValue::Single(value));
-                    continue;
+                if let Some(ref env_var) = arg.env {
+                    if let Ok(value) = std::env::var(env_var) {
+                        matches.insert(arg.name.clone(), ArgValue::Single(value));
+                        continue;
+                    }
                 }
-                // Then apply default value
                 if let Some(ref default) = arg.default_value {
                     matches.insert(arg.name.clone(), ArgValue::Single(default.clone()));
                 }
             }
         }
+        Ok(())
+    }
 
-        // Check argument dependencies (requires)
+    /// Check argument dependencies
+    fn check_dependencies(&self, matches: &ArgMatches) -> CommandResult<()> {
         for arg in &self.args {
             if matches.is_present(&arg.name) {
                 for required in &arg.requires {
@@ -898,8 +962,11 @@ impl Command {
                 }
             }
         }
+        Ok(())
+    }
 
-        // Check argument conflicts
+    /// Check argument conflicts
+    fn check_conflicts(&self, matches: &ArgMatches) -> CommandResult<()> {
         for arg in &self.args {
             if matches.is_present(&arg.name) {
                 for conflict in &arg.conflicts_with {
@@ -912,8 +979,11 @@ impl Command {
                 }
             }
         }
+        Ok(())
+    }
 
-        // Validate argument groups
+    /// Validate argument groups
+    fn validate_groups(&self, matches: &ArgMatches) -> CommandResult<()> {
         for group in &self.groups {
             let present_count = group.args.iter().filter(|a| matches.is_present(a)).count();
 
@@ -939,7 +1009,7 @@ impl Command {
             }
         }
 
-        Ok(matches)
+        Ok(())
     }
 }
 

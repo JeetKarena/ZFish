@@ -68,7 +68,7 @@ Add zfish to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-zfish = "0.1"
+zfish = "0.1.10"
 ```
 
 **Alternative: Install from GitHub Packages**

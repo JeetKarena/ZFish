@@ -80,49 +80,8 @@ impl Args {
         let mut i = 0;
         while i < args.len() {
             let arg = &args[i];
-
-            if let Some(without_prefix) = arg.strip_prefix("--") {
-                // Long option or flag
-                if without_prefix.contains('=') {
-                    // Option with value: --key=value
-                    let parts: Vec<&str> = without_prefix.splitn(2, '=').collect();
-                    options.insert(parts[0].to_string(), parts[1].to_string());
-                } else if i + 1 < args.len() && !args[i + 1].starts_with('-') {
-                    // Option with separate value: --key value
-                    options.insert(without_prefix.to_string(), args[i + 1].clone());
-                    i += 1;
-                } else {
-                    // Flag: --flag
-                    flags.insert(without_prefix.to_string(), true);
-                }
-            } else if let Some(without_prefix) = arg.strip_prefix('-') {
-                if without_prefix.is_empty() {
-                    // Just a dash, treat as positional
-                    positional.push(arg.clone());
-                } else {
-                    // Short flag(s): -v or -abc (multiple flags)
-                    for (j, c) in without_prefix.chars().enumerate() {
-                        let flag_name = c.to_string();
-
-                        // If this is the last character and there's a next argument that's not a flag
-                        if j == without_prefix.len() - 1
-                            && i + 1 < args.len()
-                            && !args[i + 1].starts_with('-')
-                        {
-                            options.insert(flag_name, args[i + 1].clone());
-                            i += 1; // Skip next arg as we used it
-                            break;
-                        } else {
-                            flags.insert(flag_name, true);
-                        }
-                    }
-                }
-            } else {
-                // Positional argument
-                positional.push(arg.clone());
-            }
-
-            i += 1;
+            let consumed = Self::parse_argument(arg, &args, i, &mut flags, &mut options, &mut positional);
+            i += consumed;
         }
 
         Args {
@@ -131,6 +90,78 @@ impl Args {
             flags,
             options,
         }
+    }
+
+    /// Parse a single argument and return how many args were consumed
+    fn parse_argument(
+        arg: &str,
+        args: &[String],
+        index: usize,
+        flags: &mut HashMap<String, bool>,
+        options: &mut HashMap<String, String>,
+        positional: &mut Vec<String>,
+    ) -> usize {
+        if let Some(without_prefix) = arg.strip_prefix("--") {
+            Self::parse_long_argument(without_prefix, args, index, flags, options)
+        } else if let Some(without_prefix) = arg.strip_prefix('-') {
+            Self::parse_short_argument(without_prefix, arg, args, index, flags, options, positional)
+        } else {
+            positional.push(arg.to_string());
+            1
+        }
+    }
+
+    /// Parse long argument (--flag or --key=value or --key value)
+    fn parse_long_argument(
+        without_prefix: &str,
+        args: &[String],
+        index: usize,
+        flags: &mut HashMap<String, bool>,
+        options: &mut HashMap<String, String>,
+    ) -> usize {
+        if without_prefix.contains('=') {
+            let parts: Vec<&str> = without_prefix.splitn(2, '=').collect();
+            options.insert(parts[0].to_string(), parts[1].to_string());
+            1
+        } else if index + 1 < args.len() && !args[index + 1].starts_with('-') {
+            options.insert(without_prefix.to_string(), args[index + 1].clone());
+            2 // Consumed current + next
+        } else {
+            flags.insert(without_prefix.to_string(), true);
+            1
+        }
+    }
+
+    /// Parse short argument (-v or -abc)
+    fn parse_short_argument(
+        without_prefix: &str,
+        arg: &str,
+        args: &[String],
+        index: usize,
+        flags: &mut HashMap<String, bool>,
+        options: &mut HashMap<String, String>,
+        positional: &mut Vec<String>,
+    ) -> usize {
+        if without_prefix.is_empty() {
+            positional.push(arg.to_string());
+            return 1;
+        }
+
+        let mut consumed = 1;
+        for (j, c) in without_prefix.chars().enumerate() {
+            let flag_name = c.to_string();
+            let is_last_char = j == without_prefix.len() - 1;
+            let has_next_value = index + 1 < args.len() && !args[index + 1].starts_with('-');
+
+            if is_last_char && has_next_value {
+                options.insert(flag_name, args[index + 1].clone());
+                consumed = 2;
+                break;
+            } else {
+                flags.insert(flag_name, true);
+            }
+        }
+        consumed
     }
 
     /// Check if a flag is present

@@ -19,87 +19,125 @@ pub fn display_width(s: &str) -> usize {
     let mut i = 0;
 
     while i < chars.len() {
-        let c = chars[i];
-        let cp = c as u32;
-
-        if is_zero_width(cp) {
-            i += 1;
-            continue;
-        }
-
-        // Text-default emoji special-case (plain 1, with VS-16 => 2)
-        if is_text_default_emoji(cp) {
-            if i + 1 < chars.len() && (chars[i + 1] as u32) == 0xFE0F {
-                width += 2;
-                i += 2;
-            } else {
-                width += 1;
-                i += 1;
-            }
-            continue;
-        }
-
-        // Regional indicator pairs (flags)
-        if is_regional_indicator(cp) && i + 1 < chars.len() {
-            let next_cp = chars[i + 1] as u32;
-            if is_regional_indicator(next_cp) {
-                width += 2;
-                i += 2;
-                continue;
-            }
-        }
-
-        // Emoji or East Asian wide
-        if is_emoji_base(cp) || is_wide_character(cp) {
-            width += 2;
-            i += 1;
-            // Consume trailing parts of the cluster
-            while i < chars.len() {
-                let next_cp = chars[i] as u32;
-                if next_cp == 0x200D {
-                    // ZWJ
-                    i += 1; // consume ZWJ
-                    if i < chars.len() {
-                        i += 1; // consume the joined emoji base
-                        continue;
-                    }
-                    break;
-                }
-                if is_zero_width(next_cp) || is_emoji_modifier(next_cp) {
-                    i += 1;
-                    continue;
-                }
-                break;
-            }
-            continue;
-        }
-
-        // Keycap sequences: [0-9#*] + FE0F + 20E3
-        if ((0x30..=0x39).contains(&cp) || cp == 0x23 || cp == 0x2A) && i + 2 < chars.len() {
-            let vs = chars[i + 1] as u32;
-            let combining = chars[i + 2] as u32;
-            if vs == 0xFE0F && combining == 0x20E3 {
-                width += 2;
-                i += 3;
-                continue;
-            }
-        }
-
-        // Regular character (1-cell)
-        width += 1;
-        i += 1;
-        // Consume combining marks (0-cell)
-        while i < chars.len() {
-            let next_cp = chars[i] as u32;
-            if is_combining_mark(next_cp) {
-                i += 1;
-            } else {
-                break;
-            }
-        }
+        let (char_width, consumed) = char_width_at(&chars, i);
+        width += char_width;
+        i += consumed;
     }
 
     width
+}
+
+/// Calculate the width of a character at a given position and return (width, chars_consumed)
+fn char_width_at(chars: &[char], i: usize) -> (usize, usize) {
+    let c = chars[i];
+    let cp = c as u32;
+
+    if is_zero_width(cp) {
+        return (0, 1);
+    }
+
+    if is_text_default_emoji(cp) {
+        return handle_text_default_emoji(chars, i);
+    }
+
+    if is_regional_indicator(cp) {
+        return handle_regional_indicator(chars, i);
+    }
+
+    if is_emoji_base(cp) || is_wide_character(cp) {
+        return handle_wide_or_emoji(chars, i);
+    }
+
+    if is_keycap_base(cp) {
+        if let Some(result) = handle_keycap_sequence(chars, i) {
+            return result;
+        }
+    }
+
+    // Regular character (1-cell) + combining marks
+    handle_regular_char(chars, i)
+}
+
+/// Handle text-default emoji (plain 1, with VS-16 => 2)
+fn handle_text_default_emoji(chars: &[char], i: usize) -> (usize, usize) {
+    if i + 1 < chars.len() && (chars[i + 1] as u32) == 0xFE0F {
+        (2, 2)
+    } else {
+        (1, 1)
+    }
+}
+
+/// Handle regional indicator pairs (flags)
+fn handle_regional_indicator(chars: &[char], i: usize) -> (usize, usize) {
+    if i + 1 < chars.len() {
+        let next_cp = chars[i + 1] as u32;
+        if is_regional_indicator(next_cp) {
+            return (2, 2);
+        }
+    }
+    // Single regional indicator treated as wide
+    (2, 1)
+}
+
+/// Handle emoji or East Asian wide characters with ZWJ sequences
+fn handle_wide_or_emoji(chars: &[char], i: usize) -> (usize, usize) {
+    let mut consumed = 1;
+    
+    // Consume trailing parts of the cluster
+    while i + consumed < chars.len() {
+        let next_cp = chars[i + consumed] as u32;
+        
+        if next_cp == 0x200D {
+            // ZWJ - consume it and the next char if available
+            consumed += 1;
+            if i + consumed < chars.len() {
+                consumed += 1;
+            }
+            continue;
+        }
+        
+        if is_zero_width(next_cp) || is_emoji_modifier(next_cp) {
+            consumed += 1;
+            continue;
+        }
+        
+        break;
+    }
+    
+    (2, consumed)
+}
+
+/// Handle keycap sequences: [0-9#*] + FE0F + 20E3
+fn handle_keycap_sequence(chars: &[char], i: usize) -> Option<(usize, usize)> {
+    if i + 2 < chars.len() {
+        let vs = chars[i + 1] as u32;
+        let combining = chars[i + 2] as u32;
+        if vs == 0xFE0F && combining == 0x20E3 {
+            return Some((2, 3));
+        }
+    }
+    None
+}
+
+/// Handle regular character with combining marks
+fn handle_regular_char(chars: &[char], i: usize) -> (usize, usize) {
+    let mut consumed = 1;
+    
+    while i + consumed < chars.len() {
+        let next_cp = chars[i + consumed] as u32;
+        if is_combining_mark(next_cp) {
+            consumed += 1;
+        } else {
+            break;
+        }
+    }
+    
+    (1, consumed)
+}
+
+#[inline]
+fn is_keycap_base(cp: u32) -> bool {
+    (0x30..=0x39).contains(&cp) || cp == 0x23 || cp == 0x2A
 }
 
 #[inline]
